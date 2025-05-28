@@ -1,69 +1,184 @@
+import streamlit as st
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-
-label_encoder = LabelEncoder()
-# fit the encoder again on your data
-label_encoder.fit([...])
-
-joblib.dump(label_encoder, "los_label_encoder.pkl")
+import joblib
 from xgboost import XGBClassifier
-from sklearn.metrics import classification_report
-from imblearn.over_sampling import SMOTE
 
-# Load data
-df = pd.read_csv("hospitalLOS.csv")
+# Load model and label encoder
+model = joblib.load("xgb_los_model.pkl")
+label_encoder = joblib.load("los_label_encoder.pkl")
 
-# Define features
-feature_cols = [
-    'rcount', 'gender', 'dialysisrenalendstage', 'asthma', 'irondef',
-    'pneum', 'substancedependence', 'psychologicaldisordermajor', 'depress',
-    'psychother', 'fibrosisandother', 'malnutrition', 'hemo', 'hematocrit',
-    'neutrophils', 'sodium', 'glucose', 'bloodureanitro', 'creatinine',
-    'bmi', 'pulse', 'respiration', 'secondarydiagnosisnonicd9'
-]
+# Page configuration
+st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-X = df[feature_cols].copy()
+# Neumorphism + animation style
+st.markdown("""
+    <style>
+    html, body {
+        background-color: #e0e5ec;
+        font-family: 'Segoe UI', sans-serif;
+        color: #333;
+        transition: all 0.3s ease-in-out;
+    }
 
-# Encode gender
-X['gender'] = X['gender'].map({'F': 0, 'M': 1})
+    .stApp {
+        padding: 1rem;
+        animation: fadeIn 1.2s ease-in-out;
+    }
 
-# Bucket the target variable lengthofstay
-def bucket_los(days):
-    if days <= 3:
-        return 'Short'
-    elif days <= 7:
-        return 'Medium'
-    else:
-        return 'Long'
+    h1, h2 {
+        color: #2c3e50;
+    }
 
-y = df['lengthofstay'].apply(bucket_los)
+    .stButton > button {
+        background: #e0e5ec;
+        border-radius: 12px;
+        border: none;
+        color: #333;
+        padding: 0.6rem 1.5rem;
+        box-shadow: 9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
 
-# One-hot encode categorical feature secondarydiagnosisnonicd9
-X = pd.get_dummies(X, columns=['secondarydiagnosisnonicd9'], drop_first=True)
+    .stButton > button:hover {
+        background: #d1d9e6;
+        transform: scale(1.05);
+        box-shadow: 4px 4px 10px #a3b1c6, -4px -4px 10px #ffffff;
+    }
 
-# Fill missing values with mean (only numeric columns after one-hot encoding)
-X = X.apply(pd.to_numeric, errors='coerce')
-X.fillna(X.mean(), inplace=True)
+    .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
+        background: #e0e5ec !important;
+        border-radius: 10px;
+        padding: 0.5rem;
+        box-shadow: inset 5px 5px 10px #a3b1c6,
+                    inset -5px -5px 10px #ffffff;
+        transition: all 0.2s ease-in-out;
+    }
 
-# Encode target labels
-le = LabelEncoder()
-y_enc = le.fit_transform(y)
+    .stSelectbox:hover, .stCheckbox:hover, .stSlider:hover {
+        transform: scale(1.01);
+    }
 
-# Split before SMOTE to avoid data leakage
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y_enc, test_size=0.2, random_state=42, stratify=y_enc
-)
+    .block-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 2rem;
+        border-radius: 20px;
+        background: #e0e5ec;
+        box-shadow: 10px 10px 20px #a3b1c6, -10px -10px 20px #ffffff;
+        animation: fadeInUp 1s ease;
+    }
 
-# Apply SMOTE only on training data to oversample minority classes
-smote = SMOTE(random_state=42)
-X_train_smote, y_train_smote = smote.fit_resample(X_train, y_train)
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: scale(0.98); }
+        100% { opacity: 1; transform: scale(1); }
+    }
 
-# Train XGBoost classifier
-model = XGBClassifier(eval_metric='mlogloss', use_label_encoder=False)
-model.fit(X_train_smote, y_train_smote)
+    @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# Predict and evaluate
-y_pred = model.predict(X_test)
+# Title and description
+st.title("🏥 Hospital Length of Stay Predictor")
+st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
-print(classification_report(y_test, y_pred, target_names=le.classes_))
+# Form input
+with st.form("predict_form"):
+    st.subheader("🧾 Patient Information")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        rcount = st.slider("Recent Admissions", 0, 10, 1)
+        gender = st.selectbox("Gender", ["F", "M"])
+        diagnosis = st.selectbox("Secondary Diagnosis", ['None', 'DX1', 'DX2', 'DX3'])
+
+    with col2:
+        hemo = st.slider("Hemoglobin", 5.0, 20.0, 13.5)
+        hematocrit = st.slider("Hematocrit", 20.0, 60.0, 40.0)
+        neutrophils = st.slider("Neutrophils", 20.0, 90.0, 50.0)
+
+    st.subheader("🩺 Clinical Conditions")
+
+    col3, col4, col5 = st.columns(3)
+    with col3:
+        dialysis = st.checkbox("Dialysis End Stage")
+        asthma = st.checkbox("Asthma")
+        irondef = st.checkbox("Iron Deficiency")
+
+    with col4:
+        pneum = st.checkbox("Pneumonia")
+        substance = st.checkbox("Substance Dependence")
+        psychdisorder = st.checkbox("Psych Disorder")
+
+    with col5:
+        depress = st.checkbox("Depression")
+        psychother = st.checkbox("Psychotherapy")
+        fibrosis = st.checkbox("Fibrosis")
+
+    st.subheader("📊 Vitals & Labs")
+
+    col6, col7, col8 = st.columns(3)
+    with col6:
+        sodium = st.slider("Sodium", 120.0, 160.0, 140.0)
+        glucose = st.slider("Glucose", 50.0, 300.0, 100.0)
+
+    with col7:
+        bun = st.slider("BUN", 5.0, 50.0, 15.0)
+        creatinine = st.slider("Creatinine", 0.5, 5.0, 1.2)
+
+    with col8:
+        bmi = st.slider("BMI", 10.0, 50.0, 22.0)
+        pulse = st.slider("Pulse", 40, 150, 70)
+        respiration = st.slider("Respiration", 10, 40, 18)
+
+    submitted = st.form_submit_button("Predict LOS")
+
+if submitted:
+    data = {
+        'rcount': rcount,
+        'gender': 0 if gender == 'F' else 1,
+        'dialysisrenalendstage': int(dialysis),
+        'asthma': int(asthma),
+        'irondef': int(irondef),
+        'pneum': int(pneum),
+        'substancedependence': int(substance),
+        'psychologicaldisordermajor': int(psychdisorder),
+        'depress': int(depress),
+        'psychother': int(psychother),
+        'fibrosisandother': int(fibrosis),
+        'malnutrition': 0,
+        'hemo': hemo,
+        'hematocrit': hematocrit,
+        'neutrophils': neutrophils,
+        'sodium': sodium,
+        'glucose': glucose,
+        'bloodureanitro': bun,
+        'creatinine': creatinine,
+        'bmi': bmi,
+        'pulse': pulse,
+        'respiration': respiration,
+    }
+
+    for dx in ['DX1', 'DX2', 'DX3']:
+        data[f"secondarydiagnosisnonicd9_{dx}"] = 1 if diagnosis == dx else 0
+
+    input_df = pd.DataFrame([data])
+    for col in model.get_booster().feature_names:
+        if col not in input_df.columns:
+            input_df[col] = 0
+    input_df = input_df[model.get_booster().feature_names]
+
+    pred = model.predict(input_df)[0]
+    result = label_encoder.inverse_transform([pred])[0]
+
+    # Animated success message
+    st.markdown(f"""
+        <div style='padding: 1rem; margin-top: 1rem; border-radius: 15px; background: #dff0d8;
+        box-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff; 
+        animation: fadeIn 1s ease-in-out;'>
+            <h3 style='color: #3c763d;'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
+        </div>
+    """, unsafe_allow_html=True)
