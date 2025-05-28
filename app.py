@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 label_encoder = LabelEncoder()
-label_encoder.fit(feature_cols)
+label_encoder.fit(data)
 
 joblib.dump(label_encoder, "los_label_encoder.pkl")
 from xgboost import XGBClassifier
