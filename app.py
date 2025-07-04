@@ -17,14 +17,14 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Custom Styles: Healthcare UI
+# UI Styling - Healthcare Gradient & Modern Components
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
     html, body, .stApp {
         height: 100%;
         margin: 0;
-        background: linear-gradient(120deg, #e0f7fa, #f1f8e9);
+        background: linear-gradient(135deg, #d4fc79, #96e6a1);
         background-attachment: fixed;
         background-size: cover;
         font-family: 'Segoe UI', sans-serif;
@@ -35,15 +35,15 @@ st.markdown("""
         margin: 2rem auto;
         padding: 2.5rem;
         border-radius: 20px;
-        background: rgba(255, 255, 255, 0.75);
+        background: rgba(255, 255, 255, 0.85);
         box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-        backdrop-filter: blur(15px);
+        backdrop-filter: blur(12px);
     }
 
     h1 {
         font-size: 2.2rem;
         text-align: center;
-        color: #00796b;
+        color: #004d40;
         margin-bottom: 0.5rem;
     }
 
@@ -52,7 +52,7 @@ st.markdown("""
     }
 
     .stButton > button {
-        background: #26a69a;
+        background: #009688;
         color: white;
         padding: 0.6rem 1.8rem;
         font-weight: 600;
@@ -63,7 +63,7 @@ st.markdown("""
     }
 
     .stButton > button:hover {
-        background: #2bbbad;
+        background: #26a69a;
         transform: scale(1.05);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
@@ -80,7 +80,7 @@ st.markdown("""
         padding: 1.2rem;
         margin-top: 1.8rem;
         border-radius: 18px;
-        background: rgba(200, 230, 201, 0.8);
+        background: rgba(200, 230, 201, 0.85);
         backdrop-filter: blur(10px);
         color: #2e7d32;
         font-weight: bold;
