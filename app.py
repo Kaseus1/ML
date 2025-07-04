@@ -17,7 +17,7 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Neumorphic Styling with Custom Button
+# Neumorphic Styling (Fixed light mode colors)
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
@@ -54,17 +54,33 @@ st.markdown("""
         margin-bottom: 0.5rem;
     }
 
-    label {
-        font-weight: 500;
-        color: #455a64;
+    .stButton > button {
+        background: #e0e5ec;
+        color: #3f51b5;
+        padding: 0.7rem 2rem;
+        font-weight: bold;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 5px 5px 10px #babecc,
+                    -5px -5px 10px #ffffff;
+        transition: all 0.3s ease;
+    }
+
+    .stButton > button:hover {
+        background: #d4dae3;
+        transform: translateY(-2px);
+        box-shadow: 3px 3px 6px #babecc,
+                    -3px -3px 6px #ffffff;
     }
 
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background-color: rgba(255, 255, 255, 0.8) !important;
-        border-radius: 10px;
+        background-color: #e0e5ec !important;
+        border-radius: 12px;
         padding: 0.4rem;
-        color: #333333;
+        color: #2c3e50;
         font-size: 0.95rem;
+        box-shadow: inset 3px 3px 6px #babecc,
+                    inset -3px -3px 6px #ffffff;
     }
 
     .los-result {
@@ -79,35 +95,12 @@ st.markdown("""
         box-shadow: inset 4px 4px 8px #babecc,
                     inset -4px -4px 8px #ffffff;
     }
-    </style>
 
-    <script>
-    setTimeout(() => {
-        const btns = window.parent.document.querySelectorAll("button");
-        btns.forEach(btn => {
-            if (btn.innerText === "Predict LOS") {
-                btn.style.background = "#4f8edc";
-                btn.style.color = "white";
-                btn.style.fontWeight = "bold";
-                btn.style.fontSize = "16px";
-                btn.style.padding = "0.7rem 2rem";
-                btn.style.borderRadius = "12px";
-                btn.style.border = "none";
-                btn.style.boxShadow = "5px 5px 10px #babecc, -5px -5px 10px #ffffff";
-                btn.onmouseover = () => {
-                    btn.style.background = "#3d7fc9";
-                    btn.style.transform = "translateY(-2px)";
-                    btn.style.boxShadow = "3px 3px 6px #babecc, -3px -3px 6px #ffffff";
-                };
-                btn.onmouseout = () => {
-                    btn.style.background = "#4f8edc";
-                    btn.style.transform = "none";
-                    btn.style.boxShadow = "5px 5px 10px #babecc, -5px -5px 10px #ffffff";
-                };
-            }
-        });
-    }, 300);
-    </script>
+    label {
+        font-weight: 500;
+        color: #455a64;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
 # ───────────────────────────────────────────────────────────────
