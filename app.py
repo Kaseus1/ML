@@ -10,10 +10,11 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page config
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# 🌗 DARK MODE TOGGLE
-dark_mode = st.sidebar.checkbox("🌙 Enable Dark Mode", value=False)
+# 🌓 Dark Mode Toggle — placed inside main UI
+st.title("🏥 Hospital Length of Stay Predictor")
+dark_mode = st.checkbox("🌙 Enable Dark Mode")
 
-# THEME STYLES
+# THEME CONFIG
 if dark_mode:
     bg_gradient = "linear-gradient(to bottom right, #121212, #1e1e1e)"
     card_color = "rgba(30, 30, 30, 0.8)"
@@ -29,7 +30,7 @@ else:
     success_bg = "rgba(232, 245, 233, 0.6)"
     success_text = "#2e7d32"
 
-# 🧊 Inject dynamic CSS
+# Inject dynamic CSS styles
 st.markdown(f"""
     <style>
     html, body {{
@@ -97,8 +98,6 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# Title and description
-st.title("🏥 Hospital Length of Stay Predictor")
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
 # Form input
@@ -190,7 +189,6 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
-    # Dark-aware prediction result box
     st.markdown(f"""
         <div style='padding: 1rem; margin-top: 1rem; border-radius: 18px;
             background: {success_bg};
