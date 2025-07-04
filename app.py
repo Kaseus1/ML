@@ -3,9 +3,6 @@ import pandas as pd
 import joblib
 from xgboost import XGBClassifier
 
-# ───────────────────────────────────────────────────────────────
-# Configuration
-# ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Hospital LOS Predictor",
     layout="centered",
@@ -16,9 +13,7 @@ st.set_page_config(
 model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
-# ───────────────────────────────────────────────────────────────
-# Styling & Animations (includes modal)
-# ───────────────────────────────────────────────────────────────
+# ──────────────── CSS & Animation ────────────────
 bg_gradient  = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
 card_color   = "rgba(255, 255, 255, 0.60)"
 text_color   = "#212121"
@@ -109,6 +104,9 @@ st.markdown(f"""
         animation: fadeIn 0.4s ease-in-out;
     }}
     .modal-content {{
+        position: relative;
+        width: 90%;
+        max-width: 400px;
         background: {card_color};
         padding: 2rem;
         border-radius: 18px;
@@ -128,18 +126,26 @@ st.markdown(f"""
         font-size: 0.9rem;
         color: gray;
     }}
+    .close-btn {{
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #555;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }}
+    .close-btn:hover {{
+        color: red;
+    }}
     </style>
 """, unsafe_allow_html=True)
 
-# ───────────────────────────────────────────────────────────────
-# App Header
-# ───────────────────────────────────────────────────────────────
+# ──────────────── UI Layout ────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
-# ───────────────────────────────────────────────────────────────
-# Form
-# ───────────────────────────────────────────────────────────────
 with st.form("predict_form"):
     st.markdown("<h4>🧾 Patient Information</h4>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
@@ -182,9 +188,7 @@ with st.form("predict_form"):
 
     submitted = st.form_submit_button("Predict LOS")
 
-# ───────────────────────────────────────────────────────────────
-# Prediction Logic + Modal Display
-# ───────────────────────────────────────────────────────────────
+# ──────────────── Prediction & Modal ────────────────
 if submitted:
     data = {
         "rcount": rcount,
@@ -223,15 +227,16 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
-    # Display modal popup
+    # Modal output with close button and JS to hide it
     st.markdown(f"""
-        <div class="modal-overlay">
+        <div id="modal" class="modal-overlay">
             <div class="modal-content">
+                <span class="close-btn" onclick="document.getElementById('modal').style.display='none'">&times;</span>
                 <h3 style='color: {success_text}; margin-bottom: 1rem;'>
                     ✅ Predicted Length of Stay:
                 </h3>
                 <div class="modal-result">{result}</div>
-                <div class="modal-note">Make a new prediction to refresh</div>
+                <div class="modal-note">Tap ✖ to close or make a new prediction.</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
