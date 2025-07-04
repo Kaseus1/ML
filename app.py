@@ -17,7 +17,7 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Neumorphic Styling + Raised Button
+# Neumorphic Styling with Custom Button
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
@@ -54,34 +54,17 @@ st.markdown("""
         margin-bottom: 0.5rem;
     }
 
-    .stButton > button {
-        background: #4f8edc;
-        color: white;
-        padding: 0.7rem 2rem;
-        font-weight: bold;
-        border-radius: 12px;
-        border: none;
-        font-size: 1rem;
-        box-shadow: 5px 5px 10px #babecc,
-                    -5px -5px 10px #ffffff;
-        transition: 0.3s ease;
-    }
-
-    .stButton > button:hover {
-        background: #3d7fc9;
-        transform: translateY(-2px);
-        box-shadow: 3px 3px 6px #babecc,
-                    -3px -3px 6px #ffffff;
+    label {
+        font-weight: 500;
+        color: #455a64;
     }
 
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background-color: #e0e5ec !important;
-        border-radius: 12px;
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        border-radius: 10px;
         padding: 0.4rem;
-        color: #2c3e50;
+        color: #333333;
         font-size: 0.95rem;
-        box-shadow: inset 3px 3px 6px #babecc,
-                    inset -3px -3px 6px #ffffff;
     }
 
     .los-result {
@@ -96,12 +79,35 @@ st.markdown("""
         box-shadow: inset 4px 4px 8px #babecc,
                     inset -4px -4px 8px #ffffff;
     }
-
-    label {
-        font-weight: 500;
-        color: #455a64;
-    }
     </style>
+
+    <script>
+    setTimeout(() => {
+        const btns = window.parent.document.querySelectorAll("button");
+        btns.forEach(btn => {
+            if (btn.innerText === "Predict LOS") {
+                btn.style.background = "#4f8edc";
+                btn.style.color = "white";
+                btn.style.fontWeight = "bold";
+                btn.style.fontSize = "16px";
+                btn.style.padding = "0.7rem 2rem";
+                btn.style.borderRadius = "12px";
+                btn.style.border = "none";
+                btn.style.boxShadow = "5px 5px 10px #babecc, -5px -5px 10px #ffffff";
+                btn.onmouseover = () => {
+                    btn.style.background = "#3d7fc9";
+                    btn.style.transform = "translateY(-2px)";
+                    btn.style.boxShadow = "3px 3px 6px #babecc, -3px -3px 6px #ffffff";
+                };
+                btn.onmouseout = () => {
+                    btn.style.background = "#4f8edc";
+                    btn.style.transform = "none";
+                    btn.style.boxShadow = "5px 5px 10px #babecc, -5px -5px 10px #ffffff";
+                };
+            }
+        });
+    }, 300);
+    </script>
 """, unsafe_allow_html=True)
 
 # ───────────────────────────────────────────────────────────────
