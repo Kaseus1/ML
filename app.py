@@ -28,27 +28,31 @@ success_text = "#2e7d32"
 
 st.markdown(f"""
     <style>
-    @keyframes bounceInDown {{
-      0% {{ opacity: 0; transform: translateY(-100px); }}
-      60% {{ opacity: 1; transform: translateY(25px); }}
-      80% {{ transform: translateY(-10px); }}
-      100% {{ transform: translateY(0); }}
+    @keyframes fadeInDown {{
+      0% {{opacity: 0; transform: translateY(-20px);}}
+      100% {{opacity: 1; transform: translateY(0);}}
     }}
-    @keyframes fadeSlideRight {{
-      0% {{ opacity: 0; transform: translateX(-20px); }}
-      100% {{ opacity: 1; transform: translateX(0); }}
+    @keyframes fadeInUp {{
+      0% {{opacity: 0; transform: translateY(20px);}}
+      100% {{opacity: 1; transform: translateY(0);}}
     }}
     @keyframes glowPulse {{
       0% {{ box-shadow: 0 0 0px #81c784; }}
       50% {{ box-shadow: 0 0 20px #81c784; }}
       100% {{ box-shadow: 0 0 0px #81c784; }}
     }}
+    @keyframes slideInUp {{
+      0% {{ opacity: 0; transform: translateY(30px); }}
+      100% {{ opacity: 1; transform: translateY(0); }}
+    }}
 
     html, body {{
         background: {bg_gradient};
         color: {text_color};
     }}
-    .stApp {{ padding: 1rem; }}
+    .stApp {{
+        padding: 1rem;
+    }}
     .block-container {{
         max-width: 800px;
         margin: auto;
@@ -59,13 +63,12 @@ st.markdown(f"""
         box-shadow: {box_shadow};
     }}
     h1 {{
-        animation: bounceInDown 1s ease;
         text-align: center;
+        animation: fadeInDown 0.8s ease-out;
     }}
-    .animated-section {{
-        animation: fadeSlideRight 0.7s ease forwards;
-        opacity: 0;
-        margin-top: 1.5rem;
+    h4 {{
+        margin-top: 2rem;
+        animation: fadeInUp 0.6s ease-out;
     }}
     .stButton > button {{
         background: rgba(255, 255, 255, 0.1);
@@ -76,10 +79,10 @@ st.markdown(f"""
         border: 1px solid rgba(0, 0, 0, 0.05);
         backdrop-filter: blur(12px);
         box-shadow: {box_shadow};
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: all 0.3s ease;
     }}
     .stButton > button:hover {{
-        transform: scale(1.05);
+        transform: scale(1.04);
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
     }}
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
@@ -91,11 +94,11 @@ st.markdown(f"""
     }}
     .los-result {{
         padding: 1rem;
-        margin-top: 1rem;
+        margin-top: 1.5rem;
         border-radius: 18px;
         background: {success_bg};
         backdrop-filter: blur(10px);
-        animation: glowPulse 2s ease-in-out infinite;
+        animation: slideInUp 0.8s ease-out, glowPulse 2s ease-in-out infinite;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -110,7 +113,7 @@ st.markdown("Use patient clinical data to predict whether their stay will be **S
 # Prediction form
 # ───────────────────────────────────────────────────────────────
 with st.form("predict_form"):
-    st.markdown("<div class='animated-section'><h4>🧾 Patient Information</h4></div>", unsafe_allow_html=True)
+    st.markdown("<h4>🧾 Patient Information</h4>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         rcount = st.slider("Recent Admissions", 0, 10, 1)
@@ -121,7 +124,7 @@ with st.form("predict_form"):
         hematocrit = st.slider("Hematocrit", 20.0, 60.0, 40.0)
         neutrophils = st.slider("Neutrophils", 20.0, 90.0, 50.0)
 
-    st.markdown("<div class='animated-section'><h4>🩺 Clinical Conditions</h4></div>", unsafe_allow_html=True)
+    st.markdown("<h4>🩺 Clinical Conditions</h4>", unsafe_allow_html=True)
     col3, col4, col5 = st.columns(3)
     with col3:
         dialysis = st.checkbox("Dialysis End Stage")
@@ -136,7 +139,7 @@ with st.form("predict_form"):
         psychother = st.checkbox("Psychotherapy")
         fibrosis = st.checkbox("Fibrosis")
 
-    st.markdown("<div class='animated-section'><h4>📊 Vitals & Labs</h4></div>", unsafe_allow_html=True)
+    st.markdown("<h4>📊 Vitals & Labs</h4>", unsafe_allow_html=True)
     col6, col7, col8 = st.columns(3)
     with col6:
         sodium = st.slider("Sodium", 120.0, 160.0, 140.0)
@@ -192,7 +195,6 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
-    st.balloons()  # 🎉 Confetti burst on success
     st.markdown(f"""
         <div class="los-result">
             <h3 style='color: {success_text};'>
