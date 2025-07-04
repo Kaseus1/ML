@@ -17,18 +17,24 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Neumorphic Styling (Fixed light mode colors)
+# Neumorphic Styling (Light-mode only, fixed colors)
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
-    html, body, .stApp {
-        background: #e0e5ec !important;
-        font-family: 'Segoe UI', sans-serif;
-        color: #2c3e50 !important;
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
-    html {
-        color-scheme: light;
+    html, body, .stApp {
+        height: 100%;
+        margin: 0;
+        background: linear-gradient(120deg, #f0f4ff, #e0f7fa);
+        background-size: 400% 400%;
+        animation: gradientBG 20s ease infinite;
+        font-family: 'Segoe UI', sans-serif;
+        color: #2c3e50;
     }
 
     .block-container {
@@ -36,69 +42,56 @@ st.markdown("""
         margin: 2rem auto;
         padding: 2.5rem;
         border-radius: 20px;
-        background: #e0e5ec !important;
-        box-shadow: 9px 9px 16px #a3b1c6,
-                    -9px -9px 16px #ffffff;
+        background: #ecf0f3;
+        box-shadow: 8px 8px 20px #d1d9e6, -8px -8px 20px #ffffff;
     }
 
     h1 {
-        font-size: 2.4rem;
+        font-size: 2.2rem;
         text-align: center;
-        color: #3f51b5;
-        margin-bottom: 1rem;
-    }
-
-    .stSubheader {
-        color: #455a64;
-        margin-top: 1rem;
+        color: #34495e;
         margin-bottom: 0.5rem;
     }
 
+    .stSubheader {
+        color: #2c3e50;
+    }
+
     .stButton > button {
-        background: #e0e5ec;
-        color: #3f51b5;
-        padding: 0.7rem 2rem;
-        font-weight: bold;
+        background: #4a90e2 !important;
+        color: white !important;
+        padding: 0.6rem 1.8rem;
+        font-weight: 600;
         border-radius: 12px;
         border: none;
-        box-shadow: 5px 5px 10px #babecc,
-                    -5px -5px 10px #ffffff;
-        transition: all 0.3s ease;
+        box-shadow: 4px 4px 10px #c1c7d0, -4px -4px 10px #ffffff;
+        transition: 0.3s ease;
     }
 
     .stButton > button:hover {
-        background: #d4dae3;
-        transform: translateY(-2px);
-        box-shadow: 3px 3px 6px #babecc,
-                    -3px -3px 6px #ffffff;
+        background: #357ABD !important;
+        transform: scale(1.05);
     }
 
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background-color: #e0e5ec !important;
-        border-radius: 12px;
+        background-color: #ecf0f3 !important;
+        border-radius: 10px;
         padding: 0.4rem;
-        color: #2c3e50;
+        color: #333333;
         font-size: 0.95rem;
-        box-shadow: inset 3px 3px 6px #babecc,
-                    inset -3px -3px 6px #ffffff;
     }
 
     .los-result {
-        padding: 1.5rem;
+        padding: 1.2rem;
         margin-top: 2rem;
-        border-radius: 20px;
-        background: #e0e5ec;
+        border-radius: 18px;
+        background: #ffffff;
+        backdrop-filter: blur(10px);
         color: #2e7d32;
         font-weight: bold;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         text-align: center;
-        box-shadow: inset 4px 4px 8px #babecc,
-                    inset -4px -4px 8px #ffffff;
-    }
-
-    label {
-        font-weight: 500;
-        color: #455a64;
+        box-shadow: 6px 6px 12px #d1d9e6, -6px -6px 12px #ffffff;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -107,7 +100,7 @@ st.markdown("""
 # Title
 # ───────────────────────────────────────────────────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
-st.markdown("Use clinical inputs to predict if a patient’s hospital stay will be **Short**, **Medium**, or **Long**.")
+st.markdown("Use clinical data to predict if a patient’s hospital stay will be **Short**, **Medium**, or **Long**.")
 
 # ───────────────────────────────────────────────────────────────
 # Form
@@ -155,7 +148,7 @@ with st.form("predict_form"):
     submitted = st.form_submit_button("Predict LOS")
 
 # ───────────────────────────────────────────────────────────────
-# Prediction Logic
+# Prediction + Auto Scroll to Result
 # ───────────────────────────────────────────────────────────────
 if submitted:
     data = {
@@ -195,8 +188,17 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
+    # 👇 Scroll target + result display
+    st.markdown('<a name="result"></a>', unsafe_allow_html=True)
     st.markdown(f"""
         <div class="los-result">
             ✅ Predicted Length of Stay: <strong>{result}</strong>
         </div>
+    """, unsafe_allow_html=True)
+    
+    # 👇 Auto scroll to result
+    st.markdown("""
+        <script>
+            window.location.href = "#result";
+        </script>
     """, unsafe_allow_html=True)
