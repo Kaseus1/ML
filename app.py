@@ -17,90 +17,73 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling - Animated Gradient Background (Sky Blue → Lavender)
+# Styling: Animated Subtle Gradient Background
 # ───────────────────────────────────────────────────────────────
-st.markdown("""
+card_color   = "rgba(255, 255, 255, 0.60)"
+text_color   = "#212121"
+box_shadow   = "0 10px 30px rgba(0, 0, 0, 0.10)"
+success_bg   = "rgba(232, 245, 233, 0.60)"
+success_text = "#2e7d32"
+
+st.markdown(f"""
     <style>
-    /* Animated Gradient Background */
-    @keyframes gradientBG {
-        0% {
-            background-position: 0% 50%;
-        }
-        50% {
-            background-position: 100% 50%;
-        }
-        100% {
-            background-position: 0% 50%;
-        }
-    }
+    @keyframes gradientShift {{
+        0% {{ background-position: 0% 50%; }}
+        100% {{ background-position: 100% 50%; }}
+    }}
 
-    html, body, .stApp {
-        height: 100%;
-        margin: 0;
-        background: linear-gradient(-45deg, #b3e5fc, #e1bee7, #bbdefb, #d1c4e9);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    .block-container {
-        max-width: 860px;
-        margin: 2rem auto;
-        padding: 2.5rem;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.85);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-        backdrop-filter: blur(12px);
-    }
-
-    h1 {
-        font-size: 2.2rem;
+    html, body {{
+        background: linear-gradient(270deg, #74ebd5, #acb6e5, #d4fc79, #96e6a1);
+        background-size: 800% 800%;
+        animation: gradientShift 20s ease infinite;
+        color: {text_color};
+    }}
+    .stApp {{
+        padding: 1rem;
+    }}
+    .block-container {{
+        max-width: 800px;
+        margin: auto;
+        padding: 2rem;
+        border-radius: 25px;
+        background: {card_color};
+        backdrop-filter: blur(15px);
+        box-shadow: {box_shadow};
+    }}
+    h1 {{
         text-align: center;
-        color: #4527a0;
-        margin-bottom: 0.5rem;
-    }
-
-    .stSubheader {
-        color: #512da8;
-    }
-
-    .stButton > button {
-        background: #7e57c2;
-        color: white;
-        padding: 0.6rem 1.8rem;
-        font-weight: 600;
+        color: {text_color};
+    }}
+    .stButton > button {{
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
-        border: none;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: 0.3s ease;
-    }
-
-    .stButton > button:hover {
-        background: #9575cd;
-        transform: scale(1.05);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    }
-
-    .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background-color: rgba(255, 255, 255, 0.85) !important;
-        border-radius: 10px;
-        padding: 0.4rem;
-        color: #333333;
-        font-size: 0.95rem;
-    }
-
-    .los-result {
-        padding: 1.2rem;
-        margin-top: 1.8rem;
-        border-radius: 18px;
-        background: rgba(232, 234, 246, 0.9);
+        color: {text_color};
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(12px);
+        box-shadow: {box_shadow};
+        transition: all 0.3s ease;
+    }}
+    .stButton > button:hover {{
+        transform: scale(1.04);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }}
+    .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-radius: 12px;
+        padding: 0.5rem;
+        color: {text_color};
         backdrop-filter: blur(10px);
-        color: #4a148c;
-        font-weight: bold;
-        font-size: 1.2rem;
-        text-align: center;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    }
+    }}
+    .los-result {{
+        padding: 1rem;
+        margin-top: 1.5rem;
+        border-radius: 18px;
+        background: {success_bg};
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -108,7 +91,7 @@ st.markdown("""
 # Title
 # ───────────────────────────────────────────────────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
-st.markdown("Use clinical inputs to predict if a patient’s hospital stay will be **Short**, **Medium**, or **Long**.")
+st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
 # ───────────────────────────────────────────────────────────────
 # Form
@@ -198,6 +181,8 @@ if submitted:
 
     st.markdown(f"""
         <div class="los-result">
-            ✅ Predicted Length of Stay: <strong>{result}</strong>
+            <h3 style='color: {success_text};'>
+                ✅ Predicted Length of Stay: <strong>{result}</strong>
+            </h3>
         </div>
     """, unsafe_allow_html=True)
