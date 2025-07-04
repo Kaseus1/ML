@@ -4,7 +4,7 @@ import joblib
 from xgboost import XGBClassifier
 
 # ───────────────────────────────────────────────────────────────
-# Configuration
+# App Configuration
 # ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Hospital LOS Predictor",
@@ -17,7 +17,7 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling & Animations
+# Styling and Animation (No external libs)
 # ───────────────────────────────────────────────────────────────
 bg_gradient  = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
 card_color   = "rgba(255, 255, 255, 0.60)"
@@ -32,18 +32,14 @@ st.markdown(f"""
       0% {{opacity: 0; transform: translateY(-20px);}}
       100% {{opacity: 1; transform: translateY(0);}}
     }}
-    @keyframes fadeInUp {{
-      0% {{opacity: 0; transform: translateY(20px);}}
-      100% {{opacity: 1; transform: translateY(0);}}
-    }}
     @keyframes glowPulse {{
       0% {{ box-shadow: 0 0 0px #81c784; }}
       50% {{ box-shadow: 0 0 20px #81c784; }}
       100% {{ box-shadow: 0 0 0px #81c784; }}
     }}
-    @keyframes slideInUp {{
-      0% {{ opacity: 0; transform: translateY(30px); }}
-      100% {{ opacity: 1; transform: translateY(0); }}
+    @keyframes spin {{
+      0% {{ transform: rotate(0deg); }}
+      100% {{ transform: rotate(360deg); }}
     }}
 
     html, body {{
@@ -65,10 +61,6 @@ st.markdown(f"""
     h1 {{
         text-align: center;
         animation: fadeInDown 0.8s ease-out;
-    }}
-    h4 {{
-        margin-top: 2rem;
-        animation: fadeInUp 0.6s ease-out;
     }}
     .stButton > button {{
         background: rgba(255, 255, 255, 0.1);
@@ -98,22 +90,32 @@ st.markdown(f"""
         border-radius: 18px;
         background: {success_bg};
         backdrop-filter: blur(10px);
-        animation: slideInUp 0.8s ease-out, glowPulse 2s ease-in-out infinite;
+        animation: glowPulse 2s ease-in-out infinite;
+    }}
+    .loader {{
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #2196F3;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+        margin: auto;
+        margin-top: 1rem;
     }}
     </style>
 """, unsafe_allow_html=True)
 
 # ───────────────────────────────────────────────────────────────
-# App header
+# Title
 # ───────────────────────────────────────────────────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
 # ───────────────────────────────────────────────────────────────
-# Prediction form
+# Form
 # ───────────────────────────────────────────────────────────────
 with st.form("predict_form"):
-    st.markdown("<h4>🧾 Patient Information</h4>", unsafe_allow_html=True)
+    st.subheader("🧾 Patient Information")
     col1, col2 = st.columns(2)
     with col1:
         rcount = st.slider("Recent Admissions", 0, 10, 1)
@@ -124,7 +126,7 @@ with st.form("predict_form"):
         hematocrit = st.slider("Hematocrit", 20.0, 60.0, 40.0)
         neutrophils = st.slider("Neutrophils", 20.0, 90.0, 50.0)
 
-    st.markdown("<h4>🩺 Clinical Conditions</h4>", unsafe_allow_html=True)
+    st.subheader("🩺 Clinical Conditions")
     col3, col4, col5 = st.columns(3)
     with col3:
         dialysis = st.checkbox("Dialysis End Stage")
@@ -139,7 +141,7 @@ with st.form("predict_form"):
         psychother = st.checkbox("Psychotherapy")
         fibrosis = st.checkbox("Fibrosis")
 
-    st.markdown("<h4>📊 Vitals & Labs</h4>", unsafe_allow_html=True)
+    st.subheader("📊 Vitals & Labs")
     col6, col7, col8 = st.columns(3)
     with col6:
         sodium = st.slider("Sodium", 120.0, 160.0, 140.0)
@@ -155,45 +157,48 @@ with st.form("predict_form"):
     submitted = st.form_submit_button("Predict LOS")
 
 # ───────────────────────────────────────────────────────────────
-# Prediction logic
+# Prediction Logic
 # ───────────────────────────────────────────────────────────────
 if submitted:
-    data = {
-        "rcount": rcount,
-        "gender": 0 if gender == "F" else 1,
-        "dialysisrenalendstage": int(dialysis),
-        "asthma": int(asthma),
-        "irondef": int(irondef),
-        "pneum": int(pneum),
-        "substancedependence": int(substance),
-        "psychologicaldisordermajor": int(psychdisord),
-        "depress": int(depress),
-        "psychother": int(psychother),
-        "fibrosisandother": int(fibrosis),
-        "malnutrition": 0,
-        "hemo": hemo,
-        "hematocrit": hematocrit,
-        "neutrophils": neutrophils,
-        "sodium": sodium,
-        "glucose": glucose,
-        "bloodureanitro": bun,
-        "creatinine": creatinine,
-        "bmi": bmi,
-        "pulse": pulse,
-        "respiration": respiration,
-    }
+    with st.spinner("Processing prediction..."):
+        st.markdown('<div class="loader"></div>', unsafe_allow_html=True)
 
-    for dx in ["DX1", "DX2", "DX3"]:
-        data[f"secondarydiagnosisnonicd9_{dx}"] = 1 if diagnosis == dx else 0
+        data = {
+            "rcount": rcount,
+            "gender": 0 if gender == "F" else 1,
+            "dialysisrenalendstage": int(dialysis),
+            "asthma": int(asthma),
+            "irondef": int(irondef),
+            "pneum": int(pneum),
+            "substancedependence": int(substance),
+            "psychologicaldisordermajor": int(psychdisord),
+            "depress": int(depress),
+            "psychother": int(psychother),
+            "fibrosisandother": int(fibrosis),
+            "malnutrition": 0,
+            "hemo": hemo,
+            "hematocrit": hematocrit,
+            "neutrophils": neutrophils,
+            "sodium": sodium,
+            "glucose": glucose,
+            "bloodureanitro": bun,
+            "creatinine": creatinine,
+            "bmi": bmi,
+            "pulse": pulse,
+            "respiration": respiration,
+        }
 
-    input_df = pd.DataFrame([data])
-    for feat in model.get_booster().feature_names:
-        if feat not in input_df.columns:
-            input_df[feat] = 0
-    input_df = input_df[model.get_booster().feature_names]
+        for dx in ["DX1", "DX2", "DX3"]:
+            data[f"secondarydiagnosisnonicd9_{dx}"] = 1 if diagnosis == dx else 0
 
-    pred = model.predict(input_df)[0]
-    result = label_encoder.inverse_transform([pred])[0]
+        input_df = pd.DataFrame([data])
+        for feat in model.get_booster().feature_names:
+            if feat not in input_df.columns:
+                input_df[feat] = 0
+        input_df = input_df[model.get_booster().feature_names]
+
+        pred = model.predict(input_df)[0]
+        result = label_encoder.inverse_transform([pred])[0]
 
     st.markdown(f"""
         <div class="los-result">
