@@ -17,13 +17,14 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Neumorphic Styling
+# Enhanced Neumorphic Styling
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
     html, body, .stApp {
         background: #e0e5ec;
         font-family: 'Segoe UI', sans-serif;
+        color: #2c3e50;
     }
 
     .block-container {
@@ -37,10 +38,10 @@ st.markdown("""
     }
 
     h1 {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
         text-align: center;
-        color: #394867;
-        margin-bottom: 0.5rem;
+        color: #3f51b5;
+        margin-bottom: 1rem;
     }
 
     .stSubheader {
@@ -51,42 +52,50 @@ st.markdown("""
 
     .stButton > button {
         background: #e0e5ec;
-        color: #394867;
-        padding: 0.6rem 1.8rem;
-        font-weight: 600;
+        color: #3f51b5;
+        padding: 0.7rem 2rem;
+        font-weight: bold;
         border-radius: 12px;
         border: none;
-        box-shadow: inset 2px 2px 5px #babecc,
-                    inset -5px -5px 10px #ffffff;
-        transition: 0.3s ease;
+        box-shadow: 5px 5px 10px #babecc,
+                    -5px -5px 10px #ffffff;
+        transition: all 0.3s ease;
     }
 
     .stButton > button:hover {
-        background: #d1d9e6;
-        transform: scale(1.03);
+        background: #d4dae3;
+        transform: translateY(-2px);
+        box-shadow: 3px 3px 6px #babecc,
+                    -3px -3px 6px #ffffff;
     }
 
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
         background-color: #e0e5ec !important;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 0.4rem;
-        color: #394867;
+        color: #2c3e50;
         font-size: 0.95rem;
-        box-shadow: inset 2px 2px 5px #babecc,
-                    inset -5px -5px 10px #ffffff;
+        box-shadow: inset 3px 3px 6px #babecc,
+                    inset -3px -3px 6px #ffffff;
     }
 
     .los-result {
-        padding: 1.2rem;
-        margin-top: 1.8rem;
-        border-radius: 18px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-radius: 20px;
         background: #e0e5ec;
         color: #2e7d32;
         font-weight: bold;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         text-align: center;
-        box-shadow: inset 4px 4px 6px #babecc,
-                    inset -4px -4px 6px #ffffff;
+        box-shadow: inset 4px 4px 8px #babecc,
+                    inset -4px -4px 8px #ffffff;
+    }
+
+    /* Form labels */
+    label {
+        font-weight: 500;
+        color: #455a64;
     }
     </style>
 """, unsafe_allow_html=True)
