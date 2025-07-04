@@ -10,34 +10,30 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page config
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# Inject custom switch CSS (actual switch style)
+# Inject switch styling (for st.toggle)
 st.markdown("""
     <style>
-    .switch-container {
+    div[data-testid="stToggle"] {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 1.5rem;
+        gap: 0.5rem;
     }
-    .switch-label {
+
+    div[data-testid="stToggle"] label {
         font-weight: bold;
         font-size: 16px;
     }
-    .switch input[type="checkbox"] {
-        position: relative;
+
+    div[data-testid="stToggle"] > div:first-child {
         width: 50px;
         height: 26px;
-        -webkit-appearance: none;
-        background: #c6c6c6;
-        outline: none;
+        background-color: #ccc;
         border-radius: 50px;
-        transition: 0.4s;
-        cursor: pointer;
+        position: relative;
+        transition: background-color 0.3s ease;
     }
-    .switch input:checked {
-        background: #2196F3;
-    }
-    .switch input::before {
+
+    div[data-testid="stToggle"] > div:first-child:after {
         content: "";
         position: absolute;
         width: 22px;
@@ -46,10 +42,15 @@ st.markdown("""
         top: 2px;
         left: 2px;
         background: white;
-        transition: 0.4s;
+        transition: transform 0.3s ease;
     }
-    .switch input:checked::before {
+
+    div[data-testid="stToggle"] input:checked + div:after {
         transform: translateX(24px);
+    }
+
+    div[data-testid="stToggle"] input:checked + div {
+        background-color: #2196F3;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -57,31 +58,10 @@ st.markdown("""
 # Title
 st.title("🏥 Hospital Length of Stay Predictor")
 
-# Fake HTML toggle switch (linked to hidden checkbox)
-col1, col2 = st.columns([1, 8])
-with col1:
-    switch_html = st.checkbox("🌙", value=False, key="dark_toggle", label_visibility="collapsed")
-with col2:
-    st.markdown(f"""
-        <div class="switch-container">
-            <label class="switch">
-                <input type="checkbox" id="custom-switch">
-            </label>
-            <span class="switch-label">Dark Mode</span>
-        </div>
-        <script>
-        const checkbox = window.parent.document.querySelector('input#custom-switch');
-        const streamlitCheckbox = window.parent.document.querySelector('input[data-testid="stCheckbox-input"]');
-        checkbox.checked = streamlitCheckbox.checked;
-        checkbox.onclick = () => {{
-            streamlitCheckbox.click();
-        }};
-        </script>
-    """, unsafe_allow_html=True)
+# Functional toggle (not checkbox) with label
+dark_mode = st.toggle("🌙 Dark Mode")
 
-# Theme settings
-dark_mode = switch_html
-
+# Theme setup
 if dark_mode:
     bg_gradient = "linear-gradient(to bottom right, #121212, #1e1e1e)"
     card_color = "rgba(30, 30, 30, 0.85)"
@@ -97,7 +77,7 @@ else:
     success_bg = "rgba(232, 245, 233, 0.6)"
     success_text = "#2e7d32"
 
-# Apply styling
+# Apply theme
 st.markdown(f"""
     <style>
     html, body {{
