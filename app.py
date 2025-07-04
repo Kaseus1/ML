@@ -1,5 +1,7 @@
-import streamlit as st import pandas as pd import joblib from xgboost import XGBClassifier
-
+import streamlit as st
+import pandas as pd
+import joblib
+from xgboost import XGBClassifier
 Load model and label encoder
 
 model = joblib.load("xgb_los_model.pkl") label_encoder = joblib.load("los_label_encoder.pkl")
