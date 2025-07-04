@@ -17,7 +17,7 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Neumorphic Styling (Fixed light mode colors)
+# Neumorphic Styling + Raised Button
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
@@ -55,19 +55,20 @@ st.markdown("""
     }
 
     .stButton > button {
-        background: #e0e5ec;
-        color: #3f51b5;
+        background: #4f8edc;
+        color: white;
         padding: 0.7rem 2rem;
         font-weight: bold;
         border-radius: 12px;
         border: none;
+        font-size: 1rem;
         box-shadow: 5px 5px 10px #babecc,
                     -5px -5px 10px #ffffff;
-        transition: all 0.3s ease;
+        transition: 0.3s ease;
     }
 
     .stButton > button:hover {
-        background: #d4dae3;
+        background: #3d7fc9;
         transform: translateY(-2px);
         box-shadow: 3px 3px 6px #babecc,
                     -3px -3px 6px #ffffff;
