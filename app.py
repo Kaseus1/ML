@@ -17,9 +17,9 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling (No animation)
+# Styling (Simple gradient background, no animation)
 # ───────────────────────────────────────────────────────────────
-bg_gradient  = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
+bg_gradient  = "linear-gradient(to right, #43cea2, #185a9d)"  # ✨ You can change this!
 card_color   = "rgba(255, 255, 255, 0.60)"
 text_color   = "#212121"
 box_shadow   = "0 10px 30px rgba(0, 0, 0, 0.10)"
