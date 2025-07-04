@@ -10,11 +10,11 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page configuration
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# Modern Glassmorphism Style
+# Glassmorphism UI styling
 st.markdown("""
     <style>
     html, body {
-        background: linear-gradient(to right, #f0f4f8, #e8edf3);
+        background: linear-gradient(135deg, #f0f4f8 0%, #dfe9f3 100%);
         font-family: 'Segoe UI', sans-serif;
         color: #212121;
         transition: all 0.3s ease-in-out;
@@ -30,28 +30,29 @@ st.markdown("""
     }
 
     .stButton > button {
-        background: linear-gradient(145deg, #64b5f6, #42a5f5);
-        border-radius: 10px;
-        border: none;
-        color: white;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        color: #1a237e;
         padding: 0.6rem 1.5rem;
         font-weight: 600;
-        box-shadow: 0 4px 8px rgba(66, 165, 245, 0.3);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
     }
 
     .stButton > button:hover {
-        background: linear-gradient(145deg, #42a5f5, #2196f3);
+        background: rgba(255, 255, 255, 0.3);
         transform: scale(1.03);
-        box-shadow: 0 6px 12px rgba(33, 150, 243, 0.4);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
     }
 
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background: rgba(255, 255, 255, 0.8) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
         border-radius: 12px;
         padding: 0.5rem;
-        backdrop-filter: blur(8px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        backdrop-filter: blur(10px);
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
         transition: all 0.2s ease-in-out;
     }
 
@@ -63,10 +64,10 @@ st.markdown("""
         max-width: 800px;
         margin: auto;
         padding: 2rem;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         animation: fadeInUp 1s ease;
     }
 
@@ -175,12 +176,12 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
-    # Styled prediction result
+    # Glassmorphism Result Box
     st.markdown(f"""
-        <div style='padding: 1rem; margin-top: 1rem; border-radius: 15px;
-            background: rgba(232, 245, 233, 0.85);
-            backdrop-filter: blur(6px);
-            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        <div style='padding: 1rem; margin-top: 1rem; border-radius: 18px;
+            background: rgba(232, 245, 233, 0.5);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
             animation: fadeIn 1s ease-in-out;'>
             <h3 style='color: #2e7d32;'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
         </div>
