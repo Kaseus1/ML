@@ -10,13 +10,13 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page configuration
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# Neumorphism + animation style
+# Modern neumorphism + animation style
 st.markdown("""
     <style>
     html, body {
-        background-color: #e0e5ec;
+        background-color: #f5f7fa;
         font-family: 'Segoe UI', sans-serif;
-        color: #333;
+        color: #212121;
         transition: all 0.3s ease-in-out;
     }
 
@@ -26,32 +26,32 @@ st.markdown("""
     }
 
     h1, h2 {
-        color: #2c3e50;
+        color: #212121;
     }
 
     .stButton > button {
-        background: #a3b1c6;
+        background: #90caf9;
         border-radius: 12px;
         border: none;
-        color: #333;
+        color: #ffffff;
         padding: 0.6rem 1.5rem;
-        box-shadow: 9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff;
         font-weight: bold;
         transition: all 0.3s ease;
+        box-shadow: 4px 4px 10px #cfd8dc, -4px -4px 10px #ffffff;
     }
 
     .stButton > button:hover {
-        background: #d1d9e6;
+        background: #64b5f6;
         transform: scale(1.05);
-        box-shadow: 4px 4px 10px #a3b1c6, -4px -4px 10px #ffffff;
+        box-shadow: 2px 2px 8px #cfd8dc, -2px -2px 8px #ffffff;
     }
 
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background: #e0e5ec !important;
+        background: #f5f7fa !important;
         border-radius: 10px;
         padding: 0.5rem;
-        box-shadow: inset 5px 5px 10px #a3b1c6,
-                    inset -5px -5px 10px #ffffff;
+        box-shadow: inset 4px 4px 8px #cfd8dc,
+                    inset -4px -4px 8px #ffffff;
         transition: all 0.2s ease-in-out;
     }
 
@@ -64,8 +64,8 @@ st.markdown("""
         margin: auto;
         padding: 2rem;
         border-radius: 20px;
-        background: #e0e5ec;
-        box-shadow: 10px 10px 20px #a3b1c6, -10px -10px 20px #ffffff;
+        background: #f5f7fa;
+        box-shadow: 10px 10px 20px #cfd8dc, -10px -10px 20px #ffffff;
         animation: fadeInUp 1s ease;
     }
 
