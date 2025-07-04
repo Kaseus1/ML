@@ -17,9 +17,9 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling and Animation (Pure CSS)
+# Styling (No animation)
 # ───────────────────────────────────────────────────────────────
-bg_gradient  = "linear-gradient(-45deg, #e0f7fa, #ede7f6, #fce4ec, #f8bbd0)"
+bg_gradient  = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
 card_color   = "rgba(255, 255, 255, 0.60)"
 text_color   = "#212121"
 box_shadow   = "0 10px 30px rgba(0, 0, 0, 0.10)"
@@ -28,47 +28,13 @@ success_text = "#2e7d32"
 
 st.markdown(f"""
     <style>
-    /* Background Animation */
-    @keyframes gradientWave {{
-        0% {{ background-position: 0% 50%; }}
-        50% {{ background-position: 100% 50%; }}
-        100% {{ background-position: 0% 50%; }}
-    }}
-
-    @keyframes floatIcon {{
-        0% {{ transform: translateY(0px); opacity: 0.2; }}
-        50% {{ transform: translateY(-20px); opacity: 0.4; }}
-        100% {{ transform: translateY(0px); opacity: 0.2; }}
-    }}
-
-    @keyframes fadeInDown {{
-        0% {{opacity: 0; transform: translateY(-20px);}}
-        100% {{opacity: 1; transform: translateY(0);}}
-    }}
-
-    @keyframes glowPulse {{
-        0% {{ box-shadow: 0 0 0px #81c784; }}
-        50% {{ box-shadow: 0 0 20px #81c784; }}
-        100% {{ box-shadow: 0 0 0px #81c784; }}
-    }}
-
     html, body {{
-        height: 100%;
-        margin: 0;
         background: {bg_gradient};
-        background-size: 400% 400%;
-        animation: gradientWave 25s ease infinite;
         color: {text_color};
-        position: relative;
-        overflow-x: hidden;
     }}
-
     .stApp {{
         padding: 1rem;
-        position: relative;
-        z-index: 2;
     }}
-
     .block-container {{
         max-width: 800px;
         margin: auto;
@@ -77,15 +43,11 @@ st.markdown(f"""
         background: {card_color};
         backdrop-filter: blur(15px);
         box-shadow: {box_shadow};
-        position: relative;
-        z-index: 3;
     }}
-
     h1 {{
         text-align: center;
-        animation: fadeInDown 0.8s ease-out;
+        color: {text_color};
     }}
-
     .stButton > button {{
         background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
@@ -97,12 +59,10 @@ st.markdown(f"""
         box-shadow: {box_shadow};
         transition: all 0.3s ease;
     }}
-
     .stButton > button:hover {{
         transform: scale(1.04);
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
     }}
-
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
         background: rgba(255, 255, 255, 0.2) !important;
         border-radius: 12px;
@@ -110,37 +70,26 @@ st.markdown(f"""
         color: {text_color};
         backdrop-filter: blur(10px);
     }}
-
     .los-result {{
         padding: 1rem;
         margin-top: 1.5rem;
         border-radius: 18px;
         background: {success_bg};
         backdrop-filter: blur(10px);
-        animation: glowPulse 2s ease-in-out infinite;
-    }}
-
-    .floating-icon {{
-        position: fixed;
-        bottom: 10%;
-        right: 5%;
-        font-size: 5rem;
-        opacity: 0.2;
-        animation: floatIcon 6s ease-in-out infinite;
-        z-index: 1;
-        pointer-events: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }}
     </style>
-
-    <div class="floating-icon">🏥</div>
 """, unsafe_allow_html=True)
 
 # ───────────────────────────────────────────────────────────────
-# App Content
+# Title
 # ───────────────────────────────────────────────────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
+# ───────────────────────────────────────────────────────────────
+# Form
+# ───────────────────────────────────────────────────────────────
 with st.form("predict_form"):
     st.subheader("🧾 Patient Information")
     col1, col2 = st.columns(2)
