@@ -10,11 +10,11 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page configuration
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# Glassmorphism UI styling
+# Gradient Background + Glassmorphism Style
 st.markdown("""
     <style>
     html, body {
-        background: linear-gradient(135deg, #f0f4f8 0%, #dfe9f3 100%);
+        background: linear-gradient(to bottom right, #e3f2fd, #fce4ec);
         font-family: 'Segoe UI', sans-serif;
         color: #212121;
         transition: all 0.3s ease-in-out;
@@ -176,7 +176,7 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
-    # Glassmorphism Result Box
+    # Prediction result with glassmorphic style
     st.markdown(f"""
         <div style='padding: 1rem; margin-top: 1rem; border-radius: 18px;
             background: rgba(232, 245, 233, 0.5);
