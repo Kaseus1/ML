@@ -17,7 +17,7 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling and Animation (No external libs)
+# Styling & Animation (no spinner)
 # ───────────────────────────────────────────────────────────────
 bg_gradient  = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
 card_color   = "rgba(255, 255, 255, 0.60)"
@@ -36,10 +36,6 @@ st.markdown(f"""
       0% {{ box-shadow: 0 0 0px #81c784; }}
       50% {{ box-shadow: 0 0 20px #81c784; }}
       100% {{ box-shadow: 0 0 0px #81c784; }}
-    }}
-    @keyframes spin {{
-      0% {{ transform: rotate(0deg); }}
-      100% {{ transform: rotate(360deg); }}
     }}
 
     html, body {{
@@ -92,16 +88,6 @@ st.markdown(f"""
         backdrop-filter: blur(10px);
         animation: glowPulse 2s ease-in-out infinite;
     }}
-    .loader {{
-        border: 8px solid #f3f3f3;
-        border-top: 8px solid #2196F3;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 1s linear infinite;
-        margin: auto;
-        margin-top: 1rem;
-    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -109,7 +95,10 @@ st.markdown(f"""
 # Title
 # ───────────────────────────────────────────────────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
-st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
+st.markdown(
+    "Use patient clinical data to predict whether their stay will be **Short**, "
+    "**Medium**, or **Long**."
+)
 
 # ───────────────────────────────────────────────────────────────
 # Form
@@ -120,7 +109,9 @@ with st.form("predict_form"):
     with col1:
         rcount = st.slider("Recent Admissions", 0, 10, 1)
         gender = st.selectbox("Gender", ["F", "M"])
-        diagnosis = st.selectbox("Secondary Diagnosis", ["None", "DX1", "DX2", "DX3"])
+        diagnosis = st.selectbox(
+            "Secondary Diagnosis", ["None", "DX1", "DX2", "DX3"]
+        )
     with col2:
         hemo = st.slider("Hemoglobin", 5.0, 20.0, 13.5)
         hematocrit = st.slider("Hematocrit", 20.0, 60.0, 40.0)
@@ -160,50 +151,50 @@ with st.form("predict_form"):
 # Prediction Logic
 # ───────────────────────────────────────────────────────────────
 if submitted:
-    with st.spinner("Processing prediction..."):
-        st.markdown('<div class="loader"></div>', unsafe_allow_html=True)
+    data = {
+        "rcount": rcount,
+        "gender": 0 if gender == "F" else 1,
+        "dialysisrenalendstage": int(dialysis),
+        "asthma": int(asthma),
+        "irondef": int(irondef),
+        "pneum": int(pneum),
+        "substancedependence": int(substance),
+        "psychologicaldisordermajor": int(psychdisord),
+        "depress": int(depress),
+        "psychother": int(psychother),
+        "fibrosisandother": int(fibrosis),
+        "malnutrition": 0,
+        "hemo": hemo,
+        "hematocrit": hematocrit,
+        "neutrophils": neutrophils,
+        "sodium": sodium,
+        "glucose": glucose,
+        "bloodureanitro": bun,
+        "creatinine": creatinine,
+        "bmi": bmi,
+        "pulse": pulse,
+        "respiration": respiration,
+    }
 
-        data = {
-            "rcount": rcount,
-            "gender": 0 if gender == "F" else 1,
-            "dialysisrenalendstage": int(dialysis),
-            "asthma": int(asthma),
-            "irondef": int(irondef),
-            "pneum": int(pneum),
-            "substancedependence": int(substance),
-            "psychologicaldisordermajor": int(psychdisord),
-            "depress": int(depress),
-            "psychother": int(psychother),
-            "fibrosisandother": int(fibrosis),
-            "malnutrition": 0,
-            "hemo": hemo,
-            "hematocrit": hematocrit,
-            "neutrophils": neutrophils,
-            "sodium": sodium,
-            "glucose": glucose,
-            "bloodureanitro": bun,
-            "creatinine": creatinine,
-            "bmi": bmi,
-            "pulse": pulse,
-            "respiration": respiration,
-        }
+    for dx in ["DX1", "DX2", "DX3"]:
+        data[f"secondarydiagnosisnonicd9_{dx}"] = 1 if diagnosis == dx else 0
 
-        for dx in ["DX1", "DX2", "DX3"]:
-            data[f"secondarydiagnosisnonicd9_{dx}"] = 1 if diagnosis == dx else 0
+    input_df = pd.DataFrame([data])
+    for feat in model.get_booster().feature_names:
+        if feat not in input_df.columns:
+            input_df[feat] = 0
+    input_df = input_df[model.get_booster().feature_names]
 
-        input_df = pd.DataFrame([data])
-        for feat in model.get_booster().feature_names:
-            if feat not in input_df.columns:
-                input_df[feat] = 0
-        input_df = input_df[model.get_booster().feature_names]
+    pred = model.predict(input_df)[0]
+    result = label_encoder.inverse_transform([pred])[0]
 
-        pred = model.predict(input_df)[0]
-        result = label_encoder.inverse_transform([pred])[0]
-
-    st.markdown(f"""
+    st.markdown(
+        f"""
         <div class="los-result">
             <h3 style='color: {success_text};'>
                 ✅ Predicted Length of Stay: <strong>{result}</strong>
             </h3>
         </div>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+        )
