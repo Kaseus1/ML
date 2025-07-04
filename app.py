@@ -17,23 +17,12 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling - Animated Gradient + Background Illustrations
+# Neumorphic Styling
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
-    /* Animated Gradient Background */
-    @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
     html, body, .stApp {
-        height: 100%;
-        margin: 0;
-        background: linear-gradient(-45deg, #b3e5fc, #e1bee7, #bbdefb, #d1c4e9);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
+        background: #e0e5ec;
         font-family: 'Segoe UI', sans-serif;
     }
 
@@ -42,107 +31,64 @@ st.markdown("""
         margin: 2rem auto;
         padding: 2.5rem;
         border-radius: 20px;
-        background: rgba(255, 255, 255, 0.85);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-        backdrop-filter: blur(12px);
-        z-index: 1;
-        position: relative;
+        background: #e0e5ec;
+        box-shadow: 9px 9px 16px #a3b1c6,
+                    -9px -9px 16px #ffffff;
     }
 
     h1 {
         font-size: 2.2rem;
         text-align: center;
-        color: #4527a0;
+        color: #394867;
         margin-bottom: 0.5rem;
     }
 
     .stSubheader {
-        color: #512da8;
+        color: #455a64;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     .stButton > button {
-        background: #7e57c2;
-        color: white;
+        background: #e0e5ec;
+        color: #394867;
         padding: 0.6rem 1.8rem;
         font-weight: 600;
         border-radius: 12px;
         border: none;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: inset 2px 2px 5px #babecc,
+                    inset -5px -5px 10px #ffffff;
         transition: 0.3s ease;
     }
 
     .stButton > button:hover {
-        background: #9575cd;
-        transform: scale(1.05);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        background: #d1d9e6;
+        transform: scale(1.03);
     }
 
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background-color: rgba(255, 255, 255, 0.85) !important;
+        background-color: #e0e5ec !important;
         border-radius: 10px;
         padding: 0.4rem;
-        color: #333333;
+        color: #394867;
         font-size: 0.95rem;
+        box-shadow: inset 2px 2px 5px #babecc,
+                    inset -5px -5px 10px #ffffff;
     }
 
     .los-result {
         padding: 1.2rem;
         margin-top: 1.8rem;
         border-radius: 18px;
-        background: rgba(232, 234, 246, 0.9);
-        backdrop-filter: blur(10px);
-        color: #4a148c;
+        background: #e0e5ec;
+        color: #2e7d32;
         font-weight: bold;
         font-size: 1.2rem;
         text-align: center;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    }
-
-    /* Top-right stethoscope icon */
-    body::before {
-        content: "";
-        position: fixed;
-        top: 3%;
-        right: 2%;
-        width: 240px;
-        height: 240px;
-        background: url('https://img.icons8.com/clouds/500/stethoscope.png') no-repeat center center;
-        background-size: contain;
-        opacity: 0.05;
-        z-index: 0;
-        pointer-events: none;
-    }
-
-    /* Bottom-left ECG line */
-    body::after {
-        content: "";
-        position: fixed;
-        bottom: 2%;
-        left: 3%;
-        width: 280px;
-        height: 80px;
-        background: url('https://upload.wikimedia.org/wikipedia/commons/3/33/Electrocardiogram.png') no-repeat center center;
-        background-size: cover;
-        opacity: 0.04;
-        z-index: 0;
-        pointer-events: none;
-    }
-
-    /* Glowing orb for medical ambiance */
-    .bg-orb {
-        position: fixed;
-        top: 40%;
-        left: 50%;
-        width: 180px;
-        height: 180px;
-        background: radial-gradient(circle at center, rgba(103, 58, 183, 0.1), transparent);
-        border-radius: 50%;
-        filter: blur(45px);
-        z-index: 0;
-        pointer-events: none;
+        box-shadow: inset 4px 4px 6px #babecc,
+                    inset -4px -4px 6px #ffffff;
     }
     </style>
-    <div class="bg-orb"></div>
 """, unsafe_allow_html=True)
 
 # ───────────────────────────────────────────────────────────────
