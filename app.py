@@ -10,14 +10,78 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page config
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# 🌓 Dark Mode Toggle — placed inside main UI
-st.title("🏥 Hospital Length of Stay Predictor")
-dark_mode = st.checkbox("🌙 Enable Dark Mode")
+# Render Switch Toggle UI
+st.markdown("""
+<style>
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  display: inline-block;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider-switch {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 34px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: .4s;
+}
+.slider-switch:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+input:checked + .slider-switch {
+  background-color: #2196F3;
+}
+input:checked + .slider-switch:before {
+  transform: translateX(26px);
+}
+</style>
 
-# THEME CONFIG
+<div style='display:flex; align-items:center; gap:10px; margin-top: 10px; margin-bottom: 20px;'>
+    <label class="toggle-switch">
+        <input type="checkbox" id="dark-toggle">
+        <span class="slider-switch"></span>
+    </label>
+    <label for="dark-toggle" style='font-weight: bold; font-size: 1rem;'>🌙 Dark Mode</label>
+</div>
+""", unsafe_allow_html=True)
+
+# Streamlit input
+dark_mode = st.checkbox("Dark Mode Toggle (Hidden)", value=False, label_visibility="collapsed")
+
+# Sync custom toggle with Streamlit
+st.markdown(f"""
+<script>
+const checkbox = window.parent.document.querySelector('input#dark-toggle');
+checkbox.checked = {str(dark_mode).lower()};
+checkbox.onchange = () => {{
+    const streamlitInput = window.parent.document.querySelector('input[data-testid="stCheckbox-input"]');
+    streamlitInput.checked = checkbox.checked;
+    streamlitInput.dispatchEvent(new Event('change'));
+}};
+</script>
+""", unsafe_allow_html=True)
+
+# Theme styling
 if dark_mode:
     bg_gradient = "linear-gradient(to bottom right, #121212, #1e1e1e)"
-    card_color = "rgba(30, 30, 30, 0.8)"
+    card_color = "rgba(30, 30, 30, 0.85)"
     text_color = "#ffffff"
     box_shadow = "0 4px 12px rgba(255, 255, 255, 0.05)"
     success_bg = "rgba(56, 142, 60, 0.2)"
@@ -30,25 +94,21 @@ else:
     success_bg = "rgba(232, 245, 233, 0.6)"
     success_text = "#2e7d32"
 
-# Inject dynamic CSS styles
+# Dynamic theme CSS
 st.markdown(f"""
     <style>
     html, body {{
         background: {bg_gradient};
         font-family: 'Segoe UI', sans-serif;
         color: {text_color};
-        transition: all 0.3s ease-in-out;
     }}
-
     .stApp {{
         padding: 1rem;
         animation: fadeIn 1.2s ease-in-out;
     }}
-
     h1, h2 {{
         color: {text_color};
     }}
-
     .stButton > button {{
         background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
@@ -60,21 +120,13 @@ st.markdown(f"""
         box-shadow: {box_shadow};
         transition: all 0.3s ease;
     }}
-
-    .stButton > button:hover {{
-        background: rgba(255, 255, 255, 0.2);
-        transform: scale(1.03);
-    }}
-
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
         background: rgba(255, 255, 255, 0.2) !important;
         border-radius: 12px;
         padding: 0.5rem;
         color: {text_color};
         backdrop-filter: blur(10px);
-        box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
     }}
-
     .block-container {{
         max-width: 800px;
         margin: auto;
@@ -83,24 +135,15 @@ st.markdown(f"""
         background: {card_color};
         backdrop-filter: blur(15px);
         box-shadow: {box_shadow};
-        animation: fadeInUp 1s ease;
-    }}
-
-    @keyframes fadeIn {{
-        0% {{ opacity: 0; transform: scale(0.98); }}
-        100% {{ opacity: 1; transform: scale(1); }}
-    }}
-
-    @keyframes fadeInUp {{
-        0% {{ opacity: 0; transform: translateY(20px); }}
-        100% {{ opacity: 1; transform: translateY(0); }}
     }}
     </style>
 """, unsafe_allow_html=True)
 
+# Title and description
+st.title("🏥 Hospital Length of Stay Predictor")
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
-# Form input
+# === FORM START ===
 with st.form("predict_form"):
     st.subheader("🧾 Patient Information")
 
@@ -116,7 +159,6 @@ with st.form("predict_form"):
         neutrophils = st.slider("Neutrophils", 20.0, 90.0, 50.0)
 
     st.subheader("🩺 Clinical Conditions")
-
     col3, col4, col5 = st.columns(3)
     with col3:
         dialysis = st.checkbox("Dialysis End Stage")
@@ -134,7 +176,6 @@ with st.form("predict_form"):
         fibrosis = st.checkbox("Fibrosis")
 
     st.subheader("📊 Vitals & Labs")
-
     col6, col7, col8 = st.columns(3)
     with col6:
         sodium = st.slider("Sodium", 120.0, 160.0, 140.0)
@@ -151,6 +192,7 @@ with st.form("predict_form"):
 
     submitted = st.form_submit_button("Predict LOS")
 
+# === PREDICTION RESULT ===
 if submitted:
     data = {
         'rcount': rcount,
@@ -193,8 +235,7 @@ if submitted:
         <div style='padding: 1rem; margin-top: 1rem; border-radius: 18px;
             background: {success_bg};
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease-in-out;'>
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);'>
             <h3 style='color: {success_text};'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
         </div>
     """, unsafe_allow_html=True)
