@@ -10,11 +10,11 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page configuration
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# Modern neumorphism + animation style
+# Modern Glassmorphism Style
 st.markdown("""
     <style>
     html, body {
-        background-color: #f5f7fa;
+        background: linear-gradient(to right, #f0f4f8, #e8edf3);
         font-family: 'Segoe UI', sans-serif;
         color: #212121;
         transition: all 0.3s ease-in-out;
@@ -26,32 +26,32 @@ st.markdown("""
     }
 
     h1, h2 {
-        color: #212121;
+        color: #1a237e;
     }
 
     .stButton > button {
-        background: #90caf9;
-        border-radius: 12px;
+        background: linear-gradient(145deg, #64b5f6, #42a5f5);
+        border-radius: 10px;
         border: none;
-        color: #ffffff;
+        color: white;
         padding: 0.6rem 1.5rem;
-        font-weight: bold;
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(66, 165, 245, 0.3);
         transition: all 0.3s ease;
-        box-shadow: 4px 4px 10px #cfd8dc, -4px -4px 10px #ffffff;
     }
 
     .stButton > button:hover {
-        background: #64b5f6;
-        transform: scale(1.05);
-        box-shadow: 2px 2px 8px #cfd8dc, -2px -2px 8px #ffffff;
+        background: linear-gradient(145deg, #42a5f5, #2196f3);
+        transform: scale(1.03);
+        box-shadow: 0 6px 12px rgba(33, 150, 243, 0.4);
     }
 
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background: #f5f7fa !important;
-        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.8) !important;
+        border-radius: 12px;
         padding: 0.5rem;
-        box-shadow: inset 4px 4px 8px #cfd8dc,
-                    inset -4px -4px 8px #ffffff;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
         transition: all 0.2s ease-in-out;
     }
 
@@ -64,8 +64,9 @@ st.markdown("""
         margin: auto;
         padding: 2rem;
         border-radius: 20px;
-        background: #f5f7fa;
-        box-shadow: 10px 10px 20px #cfd8dc, -10px -10px 20px #ffffff;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
         animation: fadeInUp 1s ease;
     }
 
@@ -174,11 +175,13 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
-    # Animated success message
+    # Styled prediction result
     st.markdown(f"""
-        <div style='padding: 1rem; margin-top: 1rem; border-radius: 15px; background: #dff0d8;
-        box-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff; 
-        animation: fadeIn 1s ease-in-out;'>
-            <h3 style='color: #3c763d;'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
+        <div style='padding: 1rem; margin-top: 1rem; border-radius: 15px;
+            background: rgba(232, 245, 233, 0.85);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+            animation: fadeIn 1s ease-in-out;'>
+            <h3 style='color: #2e7d32;'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
         </div>
     """, unsafe_allow_html=True)
