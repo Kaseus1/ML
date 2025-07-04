@@ -10,63 +10,78 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page config
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# Inject custom switch toggle CSS
+# Inject custom switch CSS (actual switch style)
 st.markdown("""
     <style>
-    html, body {
-        transition: all 0.3s ease-in-out;
+    .switch-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1.5rem;
     }
-
     .switch-label {
         font-weight: bold;
         font-size: 16px;
     }
-
-    .stCheckbox > div {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .stCheckbox input[type="checkbox"] {
-        appearance: none;
-        width: 42px;
-        height: 22px;
-        background: #ccc;
-        border-radius: 50px;
+    .switch input[type="checkbox"] {
         position: relative;
+        width: 50px;
+        height: 26px;
+        -webkit-appearance: none;
+        background: #c6c6c6;
         outline: none;
+        border-radius: 50px;
+        transition: 0.4s;
         cursor: pointer;
-        transition: background 0.3s;
     }
-
-    .stCheckbox input[type="checkbox"]::before {
+    .switch input:checked {
+        background: #2196F3;
+    }
+    .switch input::before {
         content: "";
         position: absolute;
-        width: 18px;
-        height: 18px;
-        background: white;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
         top: 2px;
         left: 2px;
-        transition: transform 0.3s;
+        background: white;
+        transition: 0.4s;
     }
-
-    .stCheckbox input[type="checkbox"]:checked {
-        background: #2196f3;
-    }
-
-    .stCheckbox input[type="checkbox"]:checked::before {
-        transform: translateX(20px);
+    .switch input:checked::before {
+        transform: translateX(24px);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Title and switch toggle
+# Title
 st.title("🏥 Hospital Length of Stay Predictor")
-dark_mode = st.checkbox("🌙 Dark Mode")
 
-# THEME
+# Fake HTML toggle switch (linked to hidden checkbox)
+col1, col2 = st.columns([1, 8])
+with col1:
+    switch_html = st.checkbox("🌙", value=False, key="dark_toggle", label_visibility="collapsed")
+with col2:
+    st.markdown(f"""
+        <div class="switch-container">
+            <label class="switch">
+                <input type="checkbox" id="custom-switch">
+            </label>
+            <span class="switch-label">Dark Mode</span>
+        </div>
+        <script>
+        const checkbox = window.parent.document.querySelector('input#custom-switch');
+        const streamlitCheckbox = window.parent.document.querySelector('input[data-testid="stCheckbox-input"]');
+        checkbox.checked = streamlitCheckbox.checked;
+        checkbox.onclick = () => {{
+            streamlitCheckbox.click();
+        }};
+        </script>
+    """, unsafe_allow_html=True)
+
+# Theme settings
+dark_mode = switch_html
+
 if dark_mode:
     bg_gradient = "linear-gradient(to bottom right, #121212, #1e1e1e)"
     card_color = "rgba(30, 30, 30, 0.85)"
@@ -82,7 +97,7 @@ else:
     success_bg = "rgba(232, 245, 233, 0.6)"
     success_text = "#2e7d32"
 
-# Apply theme
+# Apply styling
 st.markdown(f"""
     <style>
     html, body {{
@@ -125,7 +140,6 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# Description
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
 # === FORM ===
@@ -177,7 +191,7 @@ with st.form("predict_form"):
 
     submitted = st.form_submit_button("Predict LOS")
 
-# === PREDICTION ===
+# === PREDICT ===
 if submitted:
     data = {
         'rcount': rcount,
