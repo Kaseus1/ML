@@ -17,14 +17,18 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Enhanced Neumorphic Styling
+# Neumorphic Styling (Fixed light mode colors)
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
     html, body, .stApp {
-        background: #e0e5ec;
+        background: #e0e5ec !important;
         font-family: 'Segoe UI', sans-serif;
-        color: #2c3e50;
+        color: #2c3e50 !important;
+    }
+
+    html {
+        color-scheme: light;
     }
 
     .block-container {
@@ -32,7 +36,7 @@ st.markdown("""
         margin: 2rem auto;
         padding: 2.5rem;
         border-radius: 20px;
-        background: #e0e5ec;
+        background: #e0e5ec !important;
         box-shadow: 9px 9px 16px #a3b1c6,
                     -9px -9px 16px #ffffff;
     }
@@ -92,7 +96,6 @@ st.markdown("""
                     inset -4px -4px 8px #ffffff;
     }
 
-    /* Form labels */
     label {
         font-weight: 500;
         color: #455a64;
