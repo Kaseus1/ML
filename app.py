@@ -17,16 +17,29 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# UI Styling - Healthcare Gradient & Modern Components
+# Styling - Animated Gradient Background (Sky Blue → Lavender)
 # ───────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
+    /* Animated Gradient Background */
+    @keyframes gradientBG {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
     html, body, .stApp {
         height: 100%;
         margin: 0;
-        background: linear-gradient(135deg, #d4fc79, #96e6a1);
-        background-attachment: fixed;
-        background-size: cover;
+        background: linear-gradient(-45deg, #b3e5fc, #e1bee7, #bbdefb, #d1c4e9);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
         font-family: 'Segoe UI', sans-serif;
     }
 
@@ -43,16 +56,16 @@ st.markdown("""
     h1 {
         font-size: 2.2rem;
         text-align: center;
-        color: #004d40;
+        color: #4527a0;
         margin-bottom: 0.5rem;
     }
 
-    h3, .stSubheader {
-        color: #004d40;
+    .stSubheader {
+        color: #512da8;
     }
 
     .stButton > button {
-        background: #009688;
+        background: #7e57c2;
         color: white;
         padding: 0.6rem 1.8rem;
         font-weight: 600;
@@ -63,7 +76,7 @@ st.markdown("""
     }
 
     .stButton > button:hover {
-        background: #26a69a;
+        background: #9575cd;
         transform: scale(1.05);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
@@ -80,9 +93,9 @@ st.markdown("""
         padding: 1.2rem;
         margin-top: 1.8rem;
         border-radius: 18px;
-        background: rgba(200, 230, 201, 0.85);
+        background: rgba(232, 234, 246, 0.9);
         backdrop-filter: blur(10px);
-        color: #2e7d32;
+        color: #4a148c;
         font-weight: bold;
         font-size: 1.2rem;
         text-align: center;
@@ -95,10 +108,10 @@ st.markdown("""
 # Title
 # ───────────────────────────────────────────────────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
-st.markdown("Analyze patient clinical data to estimate if their hospital stay will be **Short**, **Medium**, or **Long**.")
+st.markdown("Use clinical inputs to predict if a patient’s hospital stay will be **Short**, **Medium**, or **Long**.")
 
 # ───────────────────────────────────────────────────────────────
-# Prediction Form
+# Form
 # ───────────────────────────────────────────────────────────────
 with st.form("predict_form"):
     st.subheader("🧾 Patient Information")
