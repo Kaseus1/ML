@@ -7,79 +7,93 @@ from xgboost import XGBClassifier
 model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
-# Page configuration
+# Page config
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# Gradient Background + Glassmorphism Style
-st.markdown("""
-    <style>
-    html, body {
-        background: linear-gradient(to bottom right, #e3f2fd, #fce4ec);
-        font-family: 'Segoe UI', sans-serif;
-        color: #212121;
-        transition: all 0.3s ease-in-out;
-    }
+# 🌗 DARK MODE TOGGLE
+dark_mode = st.sidebar.checkbox("🌙 Enable Dark Mode", value=False)
 
-    .stApp {
+# THEME STYLES
+if dark_mode:
+    bg_gradient = "linear-gradient(to bottom right, #121212, #1e1e1e)"
+    card_color = "rgba(30, 30, 30, 0.8)"
+    text_color = "#ffffff"
+    box_shadow = "0 4px 12px rgba(255, 255, 255, 0.05)"
+    success_bg = "rgba(56, 142, 60, 0.2)"
+    success_text = "#81c784"
+else:
+    bg_gradient = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
+    card_color = "rgba(255, 255, 255, 0.6)"
+    text_color = "#212121"
+    box_shadow = "0 10px 30px rgba(0, 0, 0, 0.1)"
+    success_bg = "rgba(232, 245, 233, 0.6)"
+    success_text = "#2e7d32"
+
+# 🧊 Inject dynamic CSS
+st.markdown(f"""
+    <style>
+    html, body {{
+        background: {bg_gradient};
+        font-family: 'Segoe UI', sans-serif;
+        color: {text_color};
+        transition: all 0.3s ease-in-out;
+    }}
+
+    .stApp {{
         padding: 1rem;
         animation: fadeIn 1.2s ease-in-out;
-    }
+    }}
 
-    h1, h2 {
-        color: #1a237e;
-    }
+    h1, h2 {{
+        color: {text_color};
+    }}
 
-    .stButton > button {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.25);
+    .stButton > button {{
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
-        color: #1a237e;
-        padding: 0.6rem 1.5rem;
+        color: {text_color};
         font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(12px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: {box_shadow};
         transition: all 0.3s ease;
-    }
+    }}
 
-    .stButton > button:hover {
-        background: rgba(255, 255, 255, 0.3);
+    .stButton > button:hover {{
+        background: rgba(255, 255, 255, 0.2);
         transform: scale(1.03);
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-    }
+    }}
 
-    .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
-        background: rgba(255, 255, 255, 0.25) !important;
+    .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
+        background: rgba(255, 255, 255, 0.2) !important;
         border-radius: 12px;
         padding: 0.5rem;
+        color: {text_color};
         backdrop-filter: blur(10px);
         box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
-        transition: all 0.2s ease-in-out;
-    }
+    }}
 
-    .stSelectbox:hover, .stCheckbox:hover, .stSlider:hover {
-        transform: scale(1.01);
-    }
-
-    .block-container {
+    .block-container {{
         max-width: 800px;
         margin: auto;
         padding: 2rem;
         border-radius: 25px;
-        background: rgba(255, 255, 255, 0.2);
+        background: {card_color};
         backdrop-filter: blur(15px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: {box_shadow};
         animation: fadeInUp 1s ease;
-    }
+    }}
 
-    @keyframes fadeIn {
-        0% { opacity: 0; transform: scale(0.98); }
-        100% { opacity: 1; transform: scale(1); }
-    }
+    @keyframes fadeIn {{
+        0% {{ opacity: 0; transform: scale(0.98); }}
+        100% {{ opacity: 1; transform: scale(1); }}
+    }}
 
-    @keyframes fadeInUp {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeInUp {{
+        0% {{ opacity: 0; transform: translateY(20px); }}
+        100% {{ opacity: 1; transform: translateY(0); }}
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -176,13 +190,13 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
-    # Prediction result with glassmorphic style
+    # Dark-aware prediction result box
     st.markdown(f"""
         <div style='padding: 1rem; margin-top: 1rem; border-radius: 18px;
-            background: rgba(232, 245, 233, 0.5);
+            background: {success_bg};
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             animation: fadeIn 1s ease-in-out;'>
-            <h3 style='color: #2e7d32;'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
+            <h3 style='color: {success_text};'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
         </div>
     """, unsafe_allow_html=True)
