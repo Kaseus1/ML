@@ -17,7 +17,7 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling & Animations
+# Styling & Animations (includes modal)
 # ───────────────────────────────────────────────────────────────
 bg_gradient  = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
 card_color   = "rgba(255, 255, 255, 0.60)"
@@ -44,6 +44,10 @@ st.markdown(f"""
     @keyframes slideInUp {{
       0% {{ opacity: 0; transform: translateY(30px); }}
       100% {{ opacity: 1; transform: translateY(0); }}
+    }}
+    @keyframes fadeIn {{
+      from {{ opacity: 0; }}
+      to {{ opacity: 1; }}
     }}
 
     html, body {{
@@ -92,25 +96,49 @@ st.markdown(f"""
         color: {text_color};
         backdrop-filter: blur(10px);
     }}
-    .los-result {{
-        padding: 1rem;
-        margin-top: 1.5rem;
+
+    .modal-overlay {{
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        animation: fadeIn 0.4s ease-in-out;
+    }}
+    .modal-content {{
+        background: {card_color};
+        padding: 2rem;
         border-radius: 18px;
-        background: {success_bg};
-        backdrop-filter: blur(10px);
-        animation: slideInUp 0.8s ease-out, glowPulse 2s ease-in-out infinite;
+        text-align: center;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        animation: slideInUp 0.5s ease;
+    }}
+    .modal-result {{
+        font-size: 2rem;
+        font-weight: bold;
+        color: {success_text};
+        animation: glowPulse 1.5s infinite;
+    }}
+    .modal-note {{
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: gray;
     }}
     </style>
 """, unsafe_allow_html=True)
 
 # ───────────────────────────────────────────────────────────────
-# App header
+# App Header
 # ───────────────────────────────────────────────────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
 # ───────────────────────────────────────────────────────────────
-# Prediction form
+# Form
 # ───────────────────────────────────────────────────────────────
 with st.form("predict_form"):
     st.markdown("<h4>🧾 Patient Information</h4>", unsafe_allow_html=True)
@@ -155,7 +183,7 @@ with st.form("predict_form"):
     submitted = st.form_submit_button("Predict LOS")
 
 # ───────────────────────────────────────────────────────────────
-# Prediction logic
+# Prediction Logic + Modal Display
 # ───────────────────────────────────────────────────────────────
 if submitted:
     data = {
@@ -195,10 +223,15 @@ if submitted:
     pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
+    # Display modal popup
     st.markdown(f"""
-        <div class="los-result">
-            <h3 style='color: {success_text};'>
-                ✅ Predicted Length of Stay: <strong>{result}</strong>
-            </h3>
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <h3 style='color: {success_text}; margin-bottom: 1rem;'>
+                    ✅ Predicted Length of Stay:
+                </h3>
+                <div class="modal-result">{result}</div>
+                <div class="modal-note">Make a new prediction to refresh</div>
+            </div>
         </div>
     """, unsafe_allow_html=True)
