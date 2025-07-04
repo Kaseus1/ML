@@ -17,7 +17,7 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling (static “light” glass-morphism look)
+# Styling & Animations
 # ───────────────────────────────────────────────────────────────
 bg_gradient  = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
 card_color   = "rgba(255, 255, 255, 0.60)"
@@ -29,16 +29,41 @@ success_text = "#2e7d32"
 st.markdown(
     f"""
     <style>
+    /* ── Keyframe Animations ─────────────────────────────── */
+    @keyframes fadeInUp {{
+      0%   {{opacity: 0; transform: translateY(30px);}}
+      100% {{opacity: 1; transform: translateY(0);}}
+    }}
+    @keyframes popIn {{
+      0%   {{opacity: 0; transform: scale(0.9);}}
+      100% {{opacity: 1; transform: scale(1);}}
+    }}
+    @keyframes slideInLeft {{
+      0%   {{opacity: 0; transform: translateX(-25px);}}
+      100% {{opacity: 1; transform: translateX(0);}}
+    }}
+
+    /* ── Global Base Styles ──────────────────────────────── */
     html, body {{
         background: {bg_gradient};
         color: {text_color};
     }}
-    .stApp {{
-        padding: 1rem;
+    .stApp {{ padding: 1rem; }}
+    h1, h2 {{ color: {text_color}; }}
+
+    /* ── Glass-card container ────────────────────────────── */
+    .block-container {{
+        max-width: 800px;
+        margin: auto;
+        padding: 2rem;
+        border-radius: 25px;
+        background: {card_color};
+        backdrop-filter: blur(15px);
+        box-shadow: {box_shadow};
+        animation: fadeInUp 0.8s ease-out both;
     }}
-    h1, h2 {{
-        color: {text_color};
-    }}
+
+    /* ── Buttons & Inputs --------------------------------- */
     .stButton > button {{
         background: rgba(255, 255, 255, 0.10);
         border-radius: 12px;
@@ -48,7 +73,12 @@ st.markdown(
         border: 1px solid rgba(0, 0, 0, 0.05);
         backdrop-filter: blur(12px);
         box-shadow: {box_shadow};
-        transition: all 0.3s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        animation: popIn 0.6s ease-out both;
+    }}
+    .stButton > button:hover {{
+        transform: scale(1.05);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.20);
     }}
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
         background: rgba(255, 255, 255, 0.20) !important;
@@ -56,16 +86,23 @@ st.markdown(
         padding: 0.5rem;
         color: {text_color};
         backdrop-filter: blur(10px);
+        animation: slideInLeft 0.6s ease-out both;
     }}
-    .block-container {{
-        max-width: 800px;
-        margin: auto;
-        padding: 2rem;
-        border-radius: 25px;
-        background: {card_color};
-        backdrop-filter: blur(15px);
-        box-shadow: {box_shadow};
+
+    /* ── Result card -------------------------------------- */
+    .los-result {{
+        animation: popIn 0.6s ease-out both;
     }}
+
+    /* ── Stagger top-level children for a neat cascade —— */
+    .block-container > * {{
+        opacity: 0;
+        animation: fadeInUp 0.6s ease-out forwards;
+    }}
+    .block-container > *:nth-child(1) {{ animation-delay: 0.10s; }}
+    .block-container > *:nth-child(2) {{ animation-delay: 0.18s; }}
+    .block-container > *:nth-child(3) {{ animation-delay: 0.26s; }}
+    .block-container > *:nth-child(4) {{ animation-delay: 0.34s; }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -176,13 +213,13 @@ if submitted:
     input_df = input_df[model.get_booster().feature_names]
 
     # Predict
-    pred    = model.predict(input_df)[0]
-    result  = label_encoder.inverse_transform([pred])[0]
+    pred   = model.predict(input_df)[0]
+    result = label_encoder.inverse_transform([pred])[0]
 
-    # Display result
+    # Display result with animation class
     st.markdown(
         f"""
-        <div style='padding:1rem;margin-top:1rem;border-radius:18px;
+        <div class="los-result" style='padding:1rem;margin-top:1rem;border-radius:18px;
              background:{success_bg};
              backdrop-filter:blur(10px);
              box-shadow:0 4px 10px rgba(0,0,0,0.2);'>
