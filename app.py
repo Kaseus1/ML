@@ -17,75 +17,77 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling (gradient now applied to html, body, .stApp)
+# Custom Styles: Healthcare UI
 # ───────────────────────────────────────────────────────────────
-bg_gradient  = "linear-gradient(to right, #43cea2, #185a9d)"   # change as you like
-card_color   = "rgba(255, 255, 255, 0.60)"
-text_color   = "#212121"
-box_shadow   = "0 10px 30px rgba(0, 0, 0, 0.10)"
-success_bg   = "rgba(232, 245, 233, 0.60)"
-success_text = "#2e7d32"
-
-st.markdown(f"""
+st.markdown("""
     <style>
-    /* Ensure gradient shows on every layer */
-    html, body, .stApp {{
+    html, body, .stApp {
         height: 100%;
         margin: 0;
-        background: {bg_gradient};
+        background: linear-gradient(120deg, #e0f7fa, #f1f8e9);
         background-attachment: fixed;
         background-size: cover;
-        color: {text_color};
-    }}
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-    .block-container {{
-        max-width: 800px;
-        margin: auto;
-        padding: 2rem;
-        border-radius: 25px;
-        background: {card_color};
+    .block-container {
+        max-width: 860px;
+        margin: 2rem auto;
+        padding: 2.5rem;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.75);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.1);
         backdrop-filter: blur(15px);
-        box-shadow: {box_shadow};
-    }}
+    }
 
-    h1 {{
+    h1 {
+        font-size: 2.2rem;
         text-align: center;
-        color: {text_color};
-    }}
+        color: #00796b;
+        margin-bottom: 0.5rem;
+    }
 
-    .stButton > button {{
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        color: {text_color};
+    h3, .stSubheader {
+        color: #004d40;
+    }
+
+    .stButton > button {
+        background: #26a69a;
+        color: white;
+        padding: 0.6rem 1.8rem;
         font-weight: 600;
-        padding: 0.6rem 1.5rem;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        backdrop-filter: blur(12px);
-        box-shadow: {box_shadow};
-        transition: 0.3s ease;
-    }}
-
-    .stButton > button:hover {{
-        transform: scale(1.04);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.2);
-    }}
-
-    .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
-        background: rgba(255,255,255,0.2) !important;
         border-radius: 12px;
-        padding: 0.5rem;
-        color: {text_color};
-        backdrop-filter: blur(10px);
-    }}
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: 0.3s ease;
+    }
 
-    .los-result {{
-        padding: 1rem;
-        margin-top: 1.5rem;
+    .stButton > button:hover {
+        background: #2bbbad;
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {
+        background-color: rgba(255, 255, 255, 0.85) !important;
+        border-radius: 10px;
+        padding: 0.4rem;
+        color: #333333;
+        font-size: 0.95rem;
+    }
+
+    .los-result {
+        padding: 1.2rem;
+        margin-top: 1.8rem;
         border-radius: 18px;
-        background: {success_bg};
+        background: rgba(200, 230, 201, 0.8);
         backdrop-filter: blur(10px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }}
+        color: #2e7d32;
+        font-weight: bold;
+        font-size: 1.2rem;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -93,10 +95,10 @@ st.markdown(f"""
 # Title
 # ───────────────────────────────────────────────────────────────
 st.title("🏥 Hospital Length of Stay Predictor")
-st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
+st.markdown("Analyze patient clinical data to estimate if their hospital stay will be **Short**, **Medium**, or **Long**.")
 
 # ───────────────────────────────────────────────────────────────
-# Form
+# Prediction Form
 # ───────────────────────────────────────────────────────────────
 with st.form("predict_form"):
     st.subheader("🧾 Patient Information")
@@ -183,6 +185,6 @@ if submitted:
 
     st.markdown(f"""
         <div class="los-result">
-            <h3 style='color:{success_text};'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
+            ✅ Predicted Length of Stay: <strong>{result}</strong>
         </div>
     """, unsafe_allow_html=True)
