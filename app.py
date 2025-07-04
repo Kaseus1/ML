@@ -3,56 +3,129 @@ import pandas as pd
 import joblib
 from xgboost import XGBClassifier
 
-# ------------------------
 # Load model and label encoder
-# ------------------------
 model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
-# ------------------------
-# Page configuration
-# ------------------------
-st.set_page_config(
-    page_title="Hospital LOS Predictor",
-    layout="centered",
-    page_icon="🏥",
-)
+# Page config
+st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# ------------------------
-# LIGHT THEME CONSTANTS (no dark mode toggle)
-# ------------------------
-BG_GRADIENT   = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
-CARD_COLOR    = "rgba(255, 255, 255, 0.6)"
-TEXT_COLOR    = "#212121"
-BOX_SHADOW    = "0 10px 30px rgba(0, 0, 0, 0.1)"
-SUCCESS_BG    = "rgba(232, 245, 233, 0.6)"
-SUCCESS_TEXT  = "#2e7d32"
+# Inject custom switch CSS (actual switch style)
+st.markdown("""
+    <style>
+    .switch-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+    }
+    .switch-label {
+        font-weight: bold;
+        font-size: 16px;
+    }
+    .switch input[type="checkbox"] {
+        position: relative;
+        width: 50px;
+        height: 26px;
+        -webkit-appearance: none;
+        background: #c6c6c6;
+        outline: none;
+        border-radius: 50px;
+        transition: 0.4s;
+        cursor: pointer;
+    }
+    .switch input:checked {
+        background: #2196F3;
+    }
+    .switch input::before {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        background: white;
+        transition: 0.4s;
+    }
+    .switch input:checked::before {
+        transform: translateX(24px);
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# Apply global style overrides
-st.markdown(
-    f"""
+# Title
+st.title("🏥 Hospital Length of Stay Predictor")
+
+# Fake HTML toggle switch (linked to hidden checkbox)
+col1, col2 = st.columns([1, 8])
+with col1:
+    switch_html = st.checkbox("🌙", value=False, key="dark_toggle", label_visibility="collapsed")
+with col2:
+    st.markdown(f"""
+        <div class="switch-container">
+            <label class="switch">
+                <input type="checkbox" id="custom-switch">
+            </label>
+            <span class="switch-label">Dark Mode</span>
+        </div>
+        <script>
+        const checkbox = window.parent.document.querySelector('input#custom-switch');
+        const streamlitCheckbox = window.parent.document.querySelector('input[data-testid="stCheckbox-input"]');
+        checkbox.checked = streamlitCheckbox.checked;
+        checkbox.onclick = () => {{
+            streamlitCheckbox.click();
+        }};
+        </script>
+    """, unsafe_allow_html=True)
+
+# Theme settings
+dark_mode = switch_html
+
+if dark_mode:
+    bg_gradient = "linear-gradient(to bottom right, #121212, #1e1e1e)"
+    card_color = "rgba(30, 30, 30, 0.85)"
+    text_color = "#ffffff"
+    box_shadow = "0 4px 12px rgba(255, 255, 255, 0.05)"
+    success_bg = "rgba(56, 142, 60, 0.2)"
+    success_text = "#81c784"
+else:
+    bg_gradient = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
+    card_color = "rgba(255, 255, 255, 0.6)"
+    text_color = "#212121"
+    box_shadow = "0 10px 30px rgba(0, 0, 0, 0.1)"
+    success_bg = "rgba(232, 245, 233, 0.6)"
+    success_text = "#2e7d32"
+
+# Apply styling
+st.markdown(f"""
     <style>
     html, body {{
-        background: {BG_GRADIENT};
-        color: {TEXT_COLOR};
+        background: {bg_gradient};
+        color: {text_color};
     }}
-    .stApp {{ padding: 1rem; }}
-    h1, h2 {{ color: {TEXT_COLOR}; }}
+    .stApp {{
+        padding: 1rem;
+    }}
+    h1, h2 {{
+        color: {text_color};
+    }}
     .stButton > button {{
         background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
-        color: {TEXT_COLOR};
+        color: {text_color};
         font-weight: 600;
         padding: 0.6rem 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(12px);
-        box-shadow: {BOX_SHADOW};
+        box-shadow: {box_shadow};
+        transition: all 0.3s ease;
     }}
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
         background: rgba(255, 255, 255, 0.2) !important;
         border-radius: 12px;
         padding: 0.5rem;
-        color: {TEXT_COLOR};
+        color: {text_color};
         backdrop-filter: blur(10px);
     }}
     .block-container {{
@@ -60,71 +133,67 @@ st.markdown(
         margin: auto;
         padding: 2rem;
         border-radius: 25px;
-        background: {CARD_COLOR};
+        background: {card_color};
         backdrop-filter: blur(15px);
-        box-shadow: {BOX_SHADOW};
+        box-shadow: {box_shadow};
     }}
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
-# ------------------------
-# App title/intro
-# ------------------------
-st.title("🏥 Hospital Length of Stay Predictor")
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
-# ------------------------
-# Prediction form
-# ------------------------
+# === FORM ===
 with st.form("predict_form"):
     st.subheader("🧾 Patient Information")
+
     col1, col2 = st.columns(2)
     with col1:
-        rcount     = st.slider("Recent Admissions", 0, 10, 1)
-        gender     = st.selectbox("Gender", ["F", "M"])
-        diagnosis  = st.selectbox("Secondary Diagnosis", ["None", "DX1", "DX2", "DX3"])
+        rcount = st.slider("Recent Admissions", 0, 10, 1)
+        gender = st.selectbox("Gender", ["F", "M"])
+        diagnosis = st.selectbox("Secondary Diagnosis", ['None', 'DX1', 'DX2', 'DX3'])
+
     with col2:
-        hemo         = st.slider("Hemoglobin", 5.0, 20.0, 13.5)
-        hematocrit   = st.slider("Hematocrit", 20.0, 60.0, 40.0)
-        neutrophils  = st.slider("Neutrophils", 20.0, 90.0, 50.0)
+        hemo = st.slider("Hemoglobin", 5.0, 20.0, 13.5)
+        hematocrit = st.slider("Hematocrit", 20.0, 60.0, 40.0)
+        neutrophils = st.slider("Neutrophils", 20.0, 90.0, 50.0)
 
     st.subheader("🩺 Clinical Conditions")
     col3, col4, col5 = st.columns(3)
     with col3:
         dialysis = st.checkbox("Dialysis End Stage")
-        asthma   = st.checkbox("Asthma")
-        irondef  = st.checkbox("Iron Deficiency")
+        asthma = st.checkbox("Asthma")
+        irondef = st.checkbox("Iron Deficiency")
+
     with col4:
-        pneum          = st.checkbox("Pneumonia")
-        substance      = st.checkbox("Substance Dependence")
-        psychdisorder  = st.checkbox("Psych Disorder")
+        pneum = st.checkbox("Pneumonia")
+        substance = st.checkbox("Substance Dependence")
+        psychdisorder = st.checkbox("Psych Disorder")
+
     with col5:
-        depress   = st.checkbox("Depression")
+        depress = st.checkbox("Depression")
         psychother = st.checkbox("Psychotherapy")
-        fibrosis  = st.checkbox("Fibrosis")
+        fibrosis = st.checkbox("Fibrosis")
 
     st.subheader("📊 Vitals & Labs")
     col6, col7, col8 = st.columns(3)
     with col6:
-        sodium   = st.slider("Sodium", 120.0, 160.0, 140.0)
-        glucose  = st.slider("Glucose", 50.0, 300.0, 100.0)
+        sodium = st.slider("Sodium", 120.0, 160.0, 140.0)
+        glucose = st.slider("Glucose", 50.0, 300.0, 100.0)
+
     with col7:
-        bun        = st.slider("BUN", 5.0, 50.0, 15.0)
+        bun = st.slider("BUN", 5.0, 50.0, 15.0)
         creatinine = st.slider("Creatinine", 0.5, 5.0, 1.2)
+
     with col8:
-        bmi         = st.slider("BMI", 10.0, 50.0, 22.0)
-        pulse       = st.slider("Pulse", 40, 150, 70)
+        bmi = st.slider("BMI", 10.0, 50.0, 22.0)
+        pulse = st.slider("Pulse", 40, 150, 70)
         respiration = st.slider("Respiration", 10, 40, 18)
 
-    submit = st.form_submit_button("Predict LOS")
+    submitted = st.form_submit_button("Predict LOS")
 
-# ------------------------
-# Prediction + animated output
-# ------------------------
-if submit:
-    features = {
+# === PREDICT ===
+if submitted:
+    data = {
         'rcount': rcount,
         'gender': 0 if gender == 'F' else 1,
         'dialysisrenalendstage': int(dialysis),
@@ -150,43 +219,22 @@ if submit:
     }
 
     for dx in ['DX1', 'DX2', 'DX3']:
-        features[f"secondarydiagnosisnonicd9_{dx}"] = 1 if diagnosis == dx else 0
+        data[f"secondarydiagnosisnonicd9_{dx}"] = 1 if diagnosis == dx else 0
 
-    df = pd.DataFrame([features])
+    input_df = pd.DataFrame([data])
     for col in model.get_booster().feature_names:
-        if col not in df.columns:
-            df[col] = 0
-    df = df[model.get_booster().feature_names]
+        if col not in input_df.columns:
+            input_df[col] = 0
+    input_df = input_df[model.get_booster().feature_names]
 
-    pred   = model.predict(df)[0]
+    pred = model.predict(input_df)[0]
     result = label_encoder.inverse_transform([pred])[0]
 
-    st.markdown(
-        f"""
-        <style>
-        @keyframes fadeInUp {{
-            0% {{ opacity: 0; transform: translateY(20px); }}
-            100% {{ opacity: 1; transform: translateY(0); }}
-        }}
-        .result-card {{
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 18px;
-            background: {SUCCESS_BG};
+    st.markdown(f"""
+        <div style='padding: 1rem; margin-top: 1rem; border-radius: 18px;
+            background: {success_bg};
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            animation: fadeInUp 0.6s ease-out;
-        }}
-        </style>
-        <div class='result-card'>
-            <h3 style='color: {SUCCESS_TEXT};'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);'>
+            <h3 style='color: {success_text};'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-Dark-mode code removed — your script now runs exclusively in the light theme with the same layout, form, prediction logic, and animated result card.
-
-Launch the updated app.py; everything should work cleanly without the top-right toggle.
-
+    """, unsafe_allow_html=True)
