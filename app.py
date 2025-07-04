@@ -3,12 +3,6 @@ import pandas as pd
 import joblib
 from xgboost import XGBClassifier
 
-───────────────────────────────────────────────────────────────
-
-Configuration
-
-───────────────────────────────────────────────────────────────
-
 st.set_page_config(
 page_title="Hospital LOS Predictor",
 layout="centered",
@@ -19,12 +13,6 @@ Load model and label encoder
 
 model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
-
-───────────────────────────────────────────────────────────────
-
-Styling & Animations
-
-───────────────────────────────────────────────────────────────
 
 bg_gradient  = "linear-gradient(to bottom right, #e3f2fd, #fce4ec)"
 card_color   = "rgba(255, 255, 255, 0.60)"
@@ -111,20 +99,10 @@ h4 {{
 
 """, unsafe_allow_html=True)
 
-───────────────────────────────────────────────────────────────
-
-App header
-
-───────────────────────────────────────────────────────────────
 
 st.title("🏥 Hospital Length of Stay Predictor")
 st.markdown("Use patient clinical data to predict whether their stay will be Short, Medium, or Long.")
 
-───────────────────────────────────────────────────────────────
-
-Prediction form
-
-───────────────────────────────────────────────────────────────
 
 with st.form("predict_form"):
 st.markdown("<h4>🧾 Patient Information</h4>", unsafe_allow_html=True)
@@ -168,11 +146,6 @@ with col8:
 
 submitted = st.form_submit_button("Predict LOS")
 
-───────────────────────────────────────────────────────────────
-
-Prediction logic
-
-───────────────────────────────────────────────────────────────
 
 if submitted:
 data = {
