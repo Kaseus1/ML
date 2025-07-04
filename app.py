@@ -17,9 +17,9 @@ model = joblib.load("xgb_los_model.pkl")
 label_encoder = joblib.load("los_label_encoder.pkl")
 
 # ───────────────────────────────────────────────────────────────
-# Styling (Simple gradient background, no animation)
+# Styling (gradient now applied to html, body, .stApp)
 # ───────────────────────────────────────────────────────────────
-bg_gradient  = "linear-gradient(to right, #43cea2, #185a9d)"  # ✨ You can change this!
+bg_gradient  = "linear-gradient(to right, #43cea2, #185a9d)"   # change as you like
 card_color   = "rgba(255, 255, 255, 0.60)"
 text_color   = "#212121"
 box_shadow   = "0 10px 30px rgba(0, 0, 0, 0.10)"
@@ -28,13 +28,16 @@ success_text = "#2e7d32"
 
 st.markdown(f"""
     <style>
-    html, body {{
+    /* Ensure gradient shows on every layer */
+    html, body, .stApp {{
+        height: 100%;
+        margin: 0;
         background: {bg_gradient};
+        background-attachment: fixed;
+        background-size: cover;
         color: {text_color};
     }}
-    .stApp {{
-        padding: 1rem;
-    }}
+
     .block-container {{
         max-width: 800px;
         margin: auto;
@@ -44,10 +47,12 @@ st.markdown(f"""
         backdrop-filter: blur(15px);
         box-shadow: {box_shadow};
     }}
+
     h1 {{
         text-align: center;
         color: {text_color};
     }}
+
     .stButton > button {{
         background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
@@ -57,26 +62,29 @@ st.markdown(f"""
         border: 1px solid rgba(0, 0, 0, 0.05);
         backdrop-filter: blur(12px);
         box-shadow: {box_shadow};
-        transition: all 0.3s ease;
+        transition: 0.3s ease;
     }}
+
     .stButton > button:hover {{
         transform: scale(1.04);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.2);
     }}
+
     .stSelectbox, .stCheckbox, .stSlider, .stNumberInput {{
-        background: rgba(255, 255, 255, 0.2) !important;
+        background: rgba(255,255,255,0.2) !important;
         border-radius: 12px;
         padding: 0.5rem;
         color: {text_color};
         backdrop-filter: blur(10px);
     }}
+
     .los-result {{
         padding: 1rem;
         margin-top: 1.5rem;
         border-radius: 18px;
         background: {success_bg};
         backdrop-filter: blur(10px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -175,8 +183,6 @@ if submitted:
 
     st.markdown(f"""
         <div class="los-result">
-            <h3 style='color: {success_text};'>
-                ✅ Predicted Length of Stay: <strong>{result}</strong>
-            </h3>
+            <h3 style='color:{success_text};'>✅ Predicted Length of Stay: <strong>{result}</strong></h3>
         </div>
     """, unsafe_allow_html=True)
