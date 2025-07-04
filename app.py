@@ -10,75 +10,63 @@ label_encoder = joblib.load("los_label_encoder.pkl")
 # Page config
 st.set_page_config(page_title="Hospital LOS Predictor", layout="centered", page_icon="🏥")
 
-# Render Switch Toggle UI
+# Inject custom switch toggle CSS
 st.markdown("""
-<style>
-.toggle-switch {
-  position: relative;
-  width: 60px;
-  display: inline-block;
-}
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider-switch {
-  position: absolute;
-  cursor: pointer;
-  background-color: #ccc;
-  border-radius: 34px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  transition: .4s;
-}
-.slider-switch:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  border-radius: 50%;
-  transition: .4s;
-}
-input:checked + .slider-switch {
-  background-color: #2196F3;
-}
-input:checked + .slider-switch:before {
-  transform: translateX(26px);
-}
-</style>
+    <style>
+    html, body {
+        transition: all 0.3s ease-in-out;
+    }
 
-<div style='display:flex; align-items:center; gap:10px; margin-top: 10px; margin-bottom: 20px;'>
-    <label class="toggle-switch">
-        <input type="checkbox" id="dark-toggle">
-        <span class="slider-switch"></span>
-    </label>
-    <label for="dark-toggle" style='font-weight: bold; font-size: 1rem;'>🌙 Dark Mode</label>
-</div>
+    .switch-label {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .stCheckbox > div {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stCheckbox input[type="checkbox"] {
+        appearance: none;
+        width: 42px;
+        height: 22px;
+        background: #ccc;
+        border-radius: 50px;
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .stCheckbox input[type="checkbox"]::before {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.3s;
+    }
+
+    .stCheckbox input[type="checkbox"]:checked {
+        background: #2196f3;
+    }
+
+    .stCheckbox input[type="checkbox"]:checked::before {
+        transform: translateX(20px);
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-# Streamlit input
-dark_mode = st.checkbox("Dark Mode Toggle (Hidden)", value=False, label_visibility="collapsed")
+# Title and switch toggle
+st.title("🏥 Hospital Length of Stay Predictor")
+dark_mode = st.checkbox("🌙 Dark Mode")
 
-# Sync custom toggle with Streamlit
-st.markdown(f"""
-<script>
-const checkbox = window.parent.document.querySelector('input#dark-toggle');
-checkbox.checked = {str(dark_mode).lower()};
-checkbox.onchange = () => {{
-    const streamlitInput = window.parent.document.querySelector('input[data-testid="stCheckbox-input"]');
-    streamlitInput.checked = checkbox.checked;
-    streamlitInput.dispatchEvent(new Event('change'));
-}};
-</script>
-""", unsafe_allow_html=True)
-
-# Theme styling
+# THEME
 if dark_mode:
     bg_gradient = "linear-gradient(to bottom right, #121212, #1e1e1e)"
     card_color = "rgba(30, 30, 30, 0.85)"
@@ -94,17 +82,15 @@ else:
     success_bg = "rgba(232, 245, 233, 0.6)"
     success_text = "#2e7d32"
 
-# Dynamic theme CSS
+# Apply theme
 st.markdown(f"""
     <style>
     html, body {{
         background: {bg_gradient};
-        font-family: 'Segoe UI', sans-serif;
         color: {text_color};
     }}
     .stApp {{
         padding: 1rem;
-        animation: fadeIn 1.2s ease-in-out;
     }}
     h1, h2 {{
         color: {text_color};
@@ -139,11 +125,10 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# Title and description
-st.title("🏥 Hospital Length of Stay Predictor")
+# Description
 st.markdown("Use patient clinical data to predict whether their stay will be **Short**, **Medium**, or **Long**.")
 
-# === FORM START ===
+# === FORM ===
 with st.form("predict_form"):
     st.subheader("🧾 Patient Information")
 
@@ -192,7 +177,7 @@ with st.form("predict_form"):
 
     submitted = st.form_submit_button("Predict LOS")
 
-# === PREDICTION RESULT ===
+# === PREDICTION ===
 if submitted:
     data = {
         'rcount': rcount,
